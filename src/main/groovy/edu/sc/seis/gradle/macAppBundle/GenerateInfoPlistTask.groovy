@@ -7,6 +7,7 @@ import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
 import groovy.xml.MarkupBuilder
+import org.gradle.api.plugins.JavaPlugin
 
 class GenerateInfoPlistTask  extends DefaultTask {
 
@@ -22,14 +23,15 @@ class GenerateInfoPlistTask  extends DefaultTask {
     @TaskAction
     def void writeInfoPlist() {
         MacAppBundlePluginExtension extension = project.macAppBundle
-        def classpath = project.configurations.runtime.collect { "lib/${it.name}" }
+        def classpath = project.configurations.runtime.collect { "${it.name}" }
+        classpath.add(project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files.getSingleFile().name)
         def file = getPlistFile()
         file.parentFile.mkdirs()
         def writer = new BufferedWriter(new FileWriter(file))
         writer.write(XML_DEF_LINE);writer.newLine();
         writer.write(DOCTYPE_LINE);writer.newLine();
         def xml = new MarkupBuilder(writer)
-        xml.plist(version="0.9") {
+        xml.plist(version:"0.9") {
             dict() {
                 key('CFBundleName')
                 string(project.name)
@@ -59,7 +61,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
                     string(extension.jvmVersion)
                     key('ClassPath')
                     array() {
-                        classpath.each() { val -> string('$JAVAROOT/'+val ) }
+                        classpath.sort().each() { val -> string('$JAVAROOT/'+val ) }
                     }
                     key('Properties')
                     dict {

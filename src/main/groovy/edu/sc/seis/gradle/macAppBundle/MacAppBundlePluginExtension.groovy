@@ -7,6 +7,8 @@ import org.gradle.api.Project;
 
 class MacAppBundlePluginExtension {
 
+    String setFileCmd = "/Developer/Tools/SetFile"
+    
     String outputDir = "macApp"
 
     String mainClassName
@@ -21,6 +23,10 @@ class MacAppBundlePluginExtension {
     
     public File getPlistFileForProject(Project project) {
         return project.file("${project.buildDir}/${outputDir}/${project.name}.app/Contents/Info.plist")
+    }
+    
+    public File getPkgInfoFileForProject(Project project) {
+        return project.file("${project.buildDir}/${outputDir}/${project.name}.app/Contents/PkgInfo")
     }
     
     public void initExtensionDefaults(Project project) {
