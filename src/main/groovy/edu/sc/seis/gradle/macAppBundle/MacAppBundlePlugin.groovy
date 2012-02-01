@@ -18,9 +18,9 @@ class MacAppBundlePlugin implements Plugin<Project> {
     static final String TASK_INFO_PLIST_GENERATE_NAME = "generatePlist"
     static final String TASK_PKG_INFO_GENERATE_NAME = "generatePkgInfo"
     
-    static final String TASK_LIB_COPY_NAME = "copyResources"
+    static final String TASK_LIB_COPY_NAME = "copyToResourcesJava"
     static final String TASK_COPY_STUB_NAME = "copyStub"
-    static final String TASK_SET_FILE_NAME = "setFile"
+    static final String TASK_SET_FILE_NAME = "runSetFile"
     static final String TASK_CREATE_APP_NAME = "createApp"
     
 
