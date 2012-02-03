@@ -41,6 +41,6 @@ class MacAppBundlePluginExtension {
     }
     
     public void initExtensionDefaults(Project project) {
-        jvmVersion = project.targetCompatibility+"+"
+        jvmVersion = project.targetCompatibility.toString()+"+"
     }
 }
