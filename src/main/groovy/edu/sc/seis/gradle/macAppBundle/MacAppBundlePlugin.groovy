@@ -48,6 +48,9 @@ class MacAppBundlePlugin implements Plugin<Project> {
         Task task = project.tasks.add(TASK_INFO_PLIST_GENERATE_NAME, GenerateInfoPlistTask)
         task.description = "Creates the Info.plist configuration file inside the mac osx .app directory."
         task.group = GROUP
+        task.inputs.property("project version", { project.version })
+        task.inputs.property("MacAppBundlePlugin extension", {project.macAppBundle})
+        task.outputs.file(project.file(project.macAppBundle.getPlistFileForProject(project)))
         return task
     }
 
@@ -75,21 +78,25 @@ class MacAppBundlePlugin implements Plugin<Project> {
         Task task = project.tasks.add(TASK_PKG_INFO_GENERATE_NAME, PkgInfoTask)
         task.description = "Creates the Info.plist configuration file inside the mac osx .app directory."
         task.group = GROUP
+        task.inputs.property("creator code", { project.macAppBundle.creatorCode } )
+        task.outputs.file(project.macAppBundle.getPkgInfoFileForProject(project))
         return task
     }
 
     private Task addSetFileTask(Project project) {
-        def run = project.tasks.add(TASK_SET_FILE_NAME, ExecSetFileTask)
-        run.description = "Runs SetFile -a B on the .app"
-        run.group = GROUP
-        return run
+        def task = project.tasks.add(TASK_SET_FILE_NAME, ExecSetFileTask)
+        task.description = "Runs SetFile -a B on the .app"
+        task.group = GROUP
+        task.inputs.file(project.file("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app"))
+        task.outputs.file(project.file("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app"))
+        return task
     }
 
     private Task addCreateAppTask(Project project) {
-        def run = project.tasks.add(TASK_CREATE_APP_NAME)
-        run.description = "Placeholder task for tasks relating to creating .app applications"
-        run.group = GROUP
-        return run
+        def task = project.tasks.add(TASK_CREATE_APP_NAME)
+        task.description = "Placeholder task for tasks relating to creating .app applications"
+        task.group = GROUP
+        return task
     }
 
     private CopySpec configureDistSpec(Project project) {
