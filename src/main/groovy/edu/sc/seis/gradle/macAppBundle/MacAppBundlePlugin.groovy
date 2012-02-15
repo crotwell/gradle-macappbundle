@@ -36,19 +36,18 @@ class MacAppBundlePlugin implements Plugin<Project> {
         Task copyTask = addCopyToLibTask(project)
         Task stubTask = addCopyStubTask(project)
         Task pkgInfoTask = createPkgInfoTask(project)
-        /** I think setfile is not required for a .app to be run on osx.
-        //Task setFileTask = addSetFileTask(project)
-        setFileTask.dependsOn(plistTask)
-        setFileTask.dependsOn(copyTask)
-        setFileTask.dependsOn(stubTask)
-        setFileTask.dependsOn(pkgInfoTask)
-        */
         Task createAppTask = addCreateAppTask(project)
-        //createAppTask.dependsOn(setFileTask)
         createAppTask.dependsOn(plistTask)
         createAppTask.dependsOn(copyTask)
         createAppTask.dependsOn(stubTask)
         createAppTask.dependsOn(pkgInfoTask)
+        Task setFileTask = addSetFileTask(project)
+        setFileTask.dependsOn(createAppTask)
+        /* I think setfile is not required for a .app to be run on osx.
+         * Leaving the task in, but not depended on by anything else. If
+         * SetFile is needed, then switch the above depends to
+        createAppTask.dependsOn(setFileTask)
+         */
         Task dmgTask = addDmgTask(project)
         dmgTask.dependsOn(createAppTask)
     }
