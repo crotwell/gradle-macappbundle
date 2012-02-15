@@ -7,6 +7,7 @@ import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.Sync;
+import org.gradle.api.tasks.Exec;
 
 
 class MacAppBundlePlugin implements Plugin<Project> {
@@ -22,6 +23,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     static final String TASK_COPY_STUB_NAME = "copyStub"
     static final String TASK_SET_FILE_NAME = "runSetFile"
     static final String TASK_CREATE_APP_NAME = "createApp"
+    static final String TASK_CREATE_DMG = "createDmg"
     
 
     def void apply(Project project) {
@@ -34,14 +36,21 @@ class MacAppBundlePlugin implements Plugin<Project> {
         Task copyTask = addCopyToLibTask(project)
         Task stubTask = addCopyStubTask(project)
         Task pkgInfoTask = createPkgInfoTask(project)
-        Task setFileTask = addSetFileTask(project)
+        /** I think setfile is not required for a .app to be run on osx.
+        //Task setFileTask = addSetFileTask(project)
         setFileTask.dependsOn(plistTask)
         setFileTask.dependsOn(copyTask)
         setFileTask.dependsOn(stubTask)
         setFileTask.dependsOn(pkgInfoTask)
-        Task mainTask = addCreateAppTask(project)
-        mainTask.dependsOn(setFileTask)
-        
+        */
+        Task createAppTask = addCreateAppTask(project)
+        //createAppTask.dependsOn(setFileTask)
+        createAppTask.dependsOn(plistTask)
+        createAppTask.dependsOn(copyTask)
+        createAppTask.dependsOn(stubTask)
+        createAppTask.dependsOn(pkgInfoTask)
+        Task dmgTask = addDmgTask(project)
+        dmgTask.dependsOn(createAppTask)
     }
 
     private Task addCreateInfoPlistTask(Project project) {
@@ -84,11 +93,25 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addSetFileTask(Project project) {
-        def task = project.tasks.add(TASK_SET_FILE_NAME, ExecSetFileTask)
-        task.description = "Runs SetFile -a B on the .app"
+        def task = project.tasks.add(TASK_SET_FILE_NAME, Exec)
+        task.description = "Runs SetFile to toggle the magic bit on the .app"
         task.group = GROUP
-        task.inputs.file(project.file("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app"))
-        task.outputs.file(project.file("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app"))
+        task.workingDir = project.file("${project.buildDir}/${project.macAppBundle.outputDir}")
+        task.commandLine "$project.macAppBundle.setFileCmd", "-a", "B", "${project.name}.app"
+        task.inputs.dir("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app")
+        task.outputs.dir("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app")
+        return task
+    }
+
+    private Task addDmgTask(Project project) {
+        def task = project.tasks.add(TASK_CREATE_DMG, Exec)
+        task.description = "Create a dmg containing the .app"
+        task.group = GROUP
+        task.workingDir = project.file("${project.buildDir}/distributions")
+        task.commandLine "hdiutil", "create", "-srcfolder", project.file("${project.buildDir}/${project.macAppBundle.outputDir}"), "${project.name}.dmg"
+        task.inputs.dir("${project.buildDir}/${project.macAppBundle.outputDir}")
+        task.outputs.file("${project.buildDir}/distributions/${project.name}.dmg")
+        task.doFirst { project.file("${project.buildDir}/distributions").mkdirs()}
         return task
     }
 
