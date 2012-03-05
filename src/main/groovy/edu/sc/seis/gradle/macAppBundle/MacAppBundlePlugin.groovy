@@ -72,12 +72,9 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addCopyStubTask(Project project) {
-        Sync task = project.tasks.add(TASK_COPY_STUB_NAME, Sync)
+        Task task = project.tasks.add(TASK_COPY_STUB_NAME, CopyJavaStubTask)
         task.description = "Copies the JavaApplicationStub into the Contents/MacOS directory."
         task.group = GROUP
-        task.with = "JavaApplicationStub"
-        task.from('/System/Library/Frameworks/JavaVM.framework/Versions/Current/Resources/MacOS/')
-        task.into { project.file("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app/Contents/MacOS") }
         task.doLast { ant.chmod(dir: project.file("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app/Contents/MacOS"), perm: "755", includes: "*") }
         return task
     }
