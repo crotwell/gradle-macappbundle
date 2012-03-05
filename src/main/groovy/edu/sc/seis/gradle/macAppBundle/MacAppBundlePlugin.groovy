@@ -76,6 +76,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.description = "Copies the JavaApplicationStub into the Contents/MacOS directory."
         task.group = GROUP
         task.doLast { ant.chmod(dir: project.file("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app/Contents/MacOS"), perm: "755", includes: "*") }
+        task.outputs.file("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app/Contents/MacOS/JavaApplicationStub")
         return task
     }
     
