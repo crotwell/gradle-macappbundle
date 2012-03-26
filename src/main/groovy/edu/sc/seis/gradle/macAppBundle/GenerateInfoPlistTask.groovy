@@ -52,7 +52,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 key('CFBundleInfoDictionaryVersion')
                 string('6.0')
                 key('CFBundleIconFile')
-                string(extension.icon)
+                string(project.file(extension.icon).name)
                 key('Java')
                 dict() {
                     key('MainClass')
