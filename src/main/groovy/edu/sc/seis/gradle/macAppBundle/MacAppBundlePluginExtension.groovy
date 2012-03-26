@@ -27,6 +27,9 @@ class MacAppBundlePluginExtension implements Serializable {
     /** The JVM version needed. Can append a + to set a minimum. */
     String jvmVersion
     
+    /** The background image for the DMG. */
+    String backgroundImage
+    
     /** Should the app use the Mac default of a single screen menubar (true) or a menubar per window (false). 
      * Default is true.
      */
