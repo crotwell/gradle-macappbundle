@@ -56,7 +56,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         Task task = project.tasks.add(TASK_INFO_PLIST_GENERATE_NAME, GenerateInfoPlistTask)
         task.description = "Creates the Info.plist configuration file inside the mac osx .app directory."
         task.group = GROUP
-        task.inputs.property("project version", { project.version })
+        task.inputs.property("project version", project.version)
         task.inputs.property("MacAppBundlePlugin extension", {project.macAppBundle})
         task.outputs.file(project.file(project.macAppBundle.getPlistFileForProject(project)))
         return task
@@ -79,6 +79,15 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.outputs.file("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app/Contents/MacOS/JavaApplicationStub")
         return task
     }
+
+    private Task addCopyIconTask(Project project) {
+        Task task = project.tasks.add(TASK_COPY_STUB_NAME, Copy)
+        task.description = "Copies the icon into the Contents/MacOS directory."
+        task.group = GROUP
+        task.from "${->project.macAppBundle.icon}"
+        task.into "${->project.buildDir}/${->project.macAppBundle.outputDir}/${->project.name}.app/Contents/Resources"
+        return task
+    }
     
     private Task createPkgInfoTask(Project project) {
         Task task = project.tasks.add(TASK_PKG_INFO_GENERATE_NAME, PkgInfoTask)
@@ -91,12 +100,14 @@ class MacAppBundlePlugin implements Plugin<Project> {
 
     private Task addSetFileTask(Project project) {
         def task = project.tasks.add(TASK_SET_FILE_NAME, Exec)
-        task.description = "Runs SetFile to toggle the magic bit on the .app"
+        task.description = "Runs SetFile to toggle the magic bit on the .app (probably not needed)"
         task.group = GROUP
-        task.workingDir = project.file("${project.buildDir}/${project.macAppBundle.outputDir}")
-        task.commandLine "$project.macAppBundle.setFileCmd", "-a", "B", "${project.name}.app"
-        task.inputs.dir("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app")
-        task.outputs.dir("${project.buildDir}/${project.macAppBundle.outputDir}/${project.name}.app")
+        task.doFirst {
+            workingDir = project.file("${project.buildDir}/${project.macAppBundle.outputDir}")
+            commandLine "${->project.macAppBundle.setFileCmd}", "-a", "B", "${project.name}.app"
+        }
+        task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.outputDir}/${->project.name}.app")
+        task.outputs.dir("${->project.buildDir}/${->project.macAppBundle.outputDir}/${->project.name}.app")
         return task
     }
 
@@ -104,10 +115,13 @@ class MacAppBundlePlugin implements Plugin<Project> {
         def task = project.tasks.add(TASK_CREATE_DMG, Exec)
         task.description = "Create a dmg containing the .app"
         task.group = GROUP
-        task.workingDir = project.file("${project.buildDir}/distributions")
-        task.commandLine "hdiutil", "create", "-srcfolder", project.file("${project.buildDir}/${project.macAppBundle.outputDir}"), "${project.name}.dmg"
+        task.doFirst {
+            workingDir = project.file("${project.buildDir}/distributions")
+            commandLine "hdiutil", "create", "-srcfolder", project.file("${project.buildDir}/${project.macAppBundle.outputDir}"), "-volname", "${->project.name}-${->project.version}",  "${->project.name}.dmg"
+        }
         task.inputs.dir("${project.buildDir}/${project.macAppBundle.outputDir}")
         task.outputs.file("${project.buildDir}/distributions/${project.name}.dmg")
+        task.doFirst { task.outputs.files.each { it.delete() } }
         task.doFirst { project.file("${project.buildDir}/distributions").mkdirs()}
         return task
     }
