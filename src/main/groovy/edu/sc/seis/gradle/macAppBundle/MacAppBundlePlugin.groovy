@@ -7,6 +7,7 @@ import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.Sync;
+import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Exec;
 
 
@@ -21,6 +22,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     
     static final String TASK_LIB_COPY_NAME = "copyToResourcesJava"
     static final String TASK_COPY_STUB_NAME = "copyStub"
+    static final String TASK_COPY_ICON_NAME = "copyIcon"
     static final String TASK_SET_FILE_NAME = "runSetFile"
     static final String TASK_CREATE_APP_NAME = "createApp"
     static final String TASK_CREATE_DMG = "createDmg"
@@ -35,11 +37,13 @@ class MacAppBundlePlugin implements Plugin<Project> {
         Task plistTask = addCreateInfoPlistTask(project)
         Task copyTask = addCopyToLibTask(project)
         Task stubTask = addCopyStubTask(project)
+        Task copyIconTask = addCopyIconTask(project)
         Task pkgInfoTask = createPkgInfoTask(project)
         Task createAppTask = addCreateAppTask(project)
         createAppTask.dependsOn(plistTask)
         createAppTask.dependsOn(copyTask)
         createAppTask.dependsOn(stubTask)
+        createAppTask.dependsOn(copyIconTask)
         createAppTask.dependsOn(pkgInfoTask)
         Task setFileTask = addSetFileTask(project)
         setFileTask.dependsOn(createAppTask)
@@ -81,7 +85,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addCopyIconTask(Project project) {
-        Task task = project.tasks.add(TASK_COPY_STUB_NAME, Copy)
+        Task task = project.tasks.add(TASK_COPY_ICON_NAME, Copy)
         task.description = "Copies the icon into the Contents/MacOS directory."
         task.group = GROUP
         task.from "${->project.macAppBundle.icon}"
