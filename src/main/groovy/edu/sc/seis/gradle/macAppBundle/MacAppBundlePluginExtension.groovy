@@ -57,6 +57,7 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((mainClassName == null) ? 0 : mainClassName.hashCode());
         result = prime * result + ((outputDir == null) ? 0 : outputDir.hashCode());
         result = prime * result + ((setFileCmd == null) ? 0 : setFileCmd.hashCode());
+        result = prime * result + ((backgroundImage == null) ? 0 : backgroundImage.hashCode());
         result = prime * result + (useScreenMenuBar ? 1231 : 1237);
         return result;
     }
@@ -99,6 +100,11 @@ class MacAppBundlePluginExtension implements Serializable {
             if (other.setFileCmd != null)
                 return false;
         } else if (!setFileCmd.equals(other.setFileCmd))
+            return false;
+        if (backgroundImage == null) {
+            if (other.backgroundImage != null)
+                return false;
+        } else if (!backgroundImage.equals(other.backgroundImage))
             return false;
         if (useScreenMenuBar != other.useScreenMenuBar)
             return false;
