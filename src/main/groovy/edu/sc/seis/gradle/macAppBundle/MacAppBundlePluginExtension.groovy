@@ -7,6 +7,17 @@ import org.gradle.api.Project;
 
 class MacAppBundlePluginExtension implements Serializable {
 
+    /** configures default values that depend on values set in the build file like version, and so must be
+     * done late in the run order, after the build script is evaluated but before any task in the plugin is run
+     * @param project
+     */
+    void configureDefaults(Project project) {
+        if (appName == null) appName = "${->project.name}"
+        if (volumeName == null) volumeName = "${->project.name}-${->project.version}"
+        if (dmgName == null) dmgName = "${->project.name}-${->project.version}"
+        if (jvmVersion == null) jvmVersion = project.targetCompatibility.toString()+"+"
+    }
+    
     /** The command SetFile, usually located in /Devloper/Tools, that sets the magic bit on a .app directory
      * to turn it into a OSX Application.
      */
@@ -21,7 +32,7 @@ class MacAppBundlePluginExtension implements Serializable {
     /** Creator code, issued by Apple. Four question marks is the default if no code has been issued. */
     String creatorCode = '????'
     
-    /** Icon for this application, defaults to the Apple GenericApp.icns. */
+    /** Icon for this application, probably needs to be a '.icns' file. Defaults to the Apple GenericApp.icns. */
     String icon = 'GenericApp.icns'
     
     /** The JVM version needed. Can append a + to set a minimum. */
@@ -30,22 +41,28 @@ class MacAppBundlePluginExtension implements Serializable {
     /** The background image for the DMG. */
     String backgroundImage
     
+    /** The name of the application, without the .app extension */
+    String appName
+    
+    /** The name of the volume */
+    String volumeName
+    
+    /** The base name of the dmg file, without the .dmg extension. */
+    String dmgName
+    
     /** Should the app use the Mac default of a single screen menubar (true) or a menubar per window (false). 
      * Default is true.
      */
     boolean useScreenMenuBar = true
     
     public File getPlistFileForProject(Project project) {
-        return project.file("${project.buildDir}/${outputDir}/${project.name}.app/Contents/Info.plist")
+        return project.file("${project.buildDir}/${outputDir}/${appName}.app/Contents/Info.plist")
     }
     
     public File getPkgInfoFileForProject(Project project) {
-        return project.file("${project.buildDir}/${outputDir}/${project.name}.app/Contents/PkgInfo")
+        return project.file("${project.buildDir}/${outputDir}/${appName}.app/Contents/PkgInfo")
     }
     
-    public void initExtensionDefaults(Project project) {
-        jvmVersion = project.targetCompatibility.toString()+"+"
-    }
 
     @Override
     public int hashCode() {
@@ -58,6 +75,9 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((outputDir == null) ? 0 : outputDir.hashCode());
         result = prime * result + ((setFileCmd == null) ? 0 : setFileCmd.hashCode());
         result = prime * result + ((backgroundImage == null) ? 0 : backgroundImage.hashCode());
+        result = prime * result + ((appName == null) ? 0 : appName.hashCode());
+        result = prime * result + ((volumeName == null) ? 0 : volumeName.hashCode());
+        result = prime * result + ((dmgName == null) ? 0 : dmgName.hashCode());
         result = prime * result + (useScreenMenuBar ? 1231 : 1237);
         return result;
     }
@@ -105,6 +125,21 @@ class MacAppBundlePluginExtension implements Serializable {
             if (other.backgroundImage != null)
                 return false;
         } else if (!backgroundImage.equals(other.backgroundImage))
+            return false;
+        if (appName == null) {
+            if (other.appName != null)
+                return false;
+        } else if (!appName.equals(other.appName))
+            return false;
+        if (volumeName == null) {
+            if (other.volumeName != null)
+                return false;
+        } else if (!volumeName.equals(other.volumeName))
+            return false;
+        if (dmgName == null) {
+            if (other.dmgName != null)
+                return false;
+        } else if (!dmgName.equals(other.dmgName))
             return false;
         if (useScreenMenuBar != other.useScreenMenuBar)
             return false;
