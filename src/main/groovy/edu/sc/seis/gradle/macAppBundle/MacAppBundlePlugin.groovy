@@ -135,8 +135,6 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.description = "Create a dmg containing the .app"
         task.group = GROUP
         task.doFirst {
-            task.inputs.files.each { print it }
-            task.outputs.files.each { print it }
             workingDir = project.file("${project.buildDir}/distributions")
             commandLine "hdiutil", "create", "-srcfolder",
              project.file("${project.buildDir}/${project.macAppBundle.outputDir}"),
