@@ -55,6 +55,30 @@ class MacAppBundlePluginExtension implements Serializable {
      */
     boolean useScreenMenuBar = true
     
+    /** The name of the executable run by the bundle.
+     * Default is 'JavaApplicationStub'.
+     */
+    String bundleExecutable = 'JavaApplicationStub'
+    
+    /** BundleAllowMixedLocalizations, default is true */
+    boolean bundleAllowMixedLocalizations = true
+    
+    /** undlePackageType, default is 'APPL' */
+    String bundlePackageType = 'APPL'
+    
+    /** BundleInfoDictionaryVersion, default is '6.0' */
+    String bundleInfoDictionaryVersion = '6.0'
+    
+    /** The development region.
+     * Default is 'English'.
+     */
+    String bundleDevelopmentRegion = 'English'
+    
+    /** Any extra xml that should be included in the info.plist file. Will be added
+     *  to the bottom inside the outermost <dict> element.
+     */
+    String extras = ""
+    
     public File getPlistFileForProject(Project project) {
         return project.file("${project.buildDir}/${outputDir}/${appName}.app/Contents/Info.plist")
     }
@@ -79,6 +103,12 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((volumeName == null) ? 0 : volumeName.hashCode());
         result = prime * result + ((dmgName == null) ? 0 : dmgName.hashCode());
         result = prime * result + (useScreenMenuBar ? 1231 : 1237);
+        result = prime * result + ((bundleExecutable == null) ? 0 : bundleExecutable.hashCode());
+        result = prime * result + (bundleAllowMixedLocalizations ? 1231 : 1237);
+        result = prime * result + ((bundlePackageType == null) ? 0 : bundlePackageType.hashCode());
+        result = prime * result + ((bundleInfoDictionaryVersion == null) ? 0 : bundleInfoDictionaryVersion.hashCode());
+        result = prime * result + ((bundleDevelopmentRegion == null) ? 0 : bundleDevelopmentRegion.hashCode());
+        result = prime * result + ((extras == null) ? 0 : extras.hashCode());
         return result;
     }
 
@@ -141,7 +171,35 @@ class MacAppBundlePluginExtension implements Serializable {
                 return false;
         } else if (!dmgName.equals(other.dmgName))
             return false;
+        if (bundleExecutable == null) {
+            if (other.bundleExecutable != null)
+                return false;
+        } else if (!bundleExecutable.equals(other.bundleExecutable))
+            return false;
+        if (bundleAllowMixedLocalizations != other.bundleAllowMixedLocalizations)
+            return false;
+        if (bundlePackageType == null) {
+            if (other.bundlePackageType != null)
+                return false;
+        } else if (!bundlePackageType.equals(other.bundlePackageType))
+            return false;
+            
+        if (bundleInfoDictionaryVersion == null) {
+            if (other.bundleInfoDictionaryVersion != null)
+                return false;
+        } else if (!bundleInfoDictionaryVersion.equals(other.bundleInfoDictionaryVersion))
+            return false;
+        if (bundleDevelopmentRegion == null) {
+            if (other.bundleDevelopmentRegion != null)
+                return false;
+        } else if (!bundleDevelopmentRegion.equals(other.bundleDevelopmentRegion))
+            return false;
         if (useScreenMenuBar != other.useScreenMenuBar)
+            return false;
+        if (extras == null) {
+            if (other.extras != null)
+                return false;
+        } else if (!extras.equals(other.extras))
             return false;
         return true;
     }
