@@ -40,17 +40,17 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 key('CFBundleVersion')
                 string(project.version)
                 key('CFBundleAllowMixedLocalizations')
-                string('true')
+                if (extension.bundleAllowMixedLocalizations) { string('true') } else { string('false') }
                 key('CFBundleExecutable')
-                string('JavaApplicationStub')
+                string(extension.bundleExecutable)
                 key('CFBundleDevelopmentRegion')
-                string('English')
+                string(extension.bundleDevelopmentRegion)
                 key('CFBundlePackageType')
-                string('APPL')
+                string(extension.bundlePackageType)
                 key('CFBundleSignature')
                 string(extension.creatorCode)
                 key('CFBundleInfoDictionaryVersion')
-                string('6.0')
+                string(extension.bundleInfoDictionaryVersion)
                 key('CFBundleIconFile')
                 string(project.file(extension.icon).name)
                 key('Java')
@@ -69,8 +69,12 @@ class GenerateInfoPlistTask  extends DefaultTask {
                         string(extension.useScreenMenuBar)
                     }
                 }
+                if (extension.extras != null) {
+                    xml.getPrinter().with { p -> p.println(extension.extras) }
+                }
             }
         }
         writer.close()
     }
+    
 }
