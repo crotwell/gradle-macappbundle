@@ -9,7 +9,7 @@ class CopyJavaStubTask extends DefaultTask {
 
     @TaskAction
     def void writeStub() {
-        def dest = project.file("${project.buildDir}/${project.macAppBundle.outputDir}/${project.macAppBundle.appName}.app/Contents/MacOS/JavaApplicationStub")
+        def dest = project.file("${project.buildDir}/${project.macAppBundle.outputDir}/${project.macAppBundle.appName}.app/Contents/MacOS/${project.macAppBundle.bundleExecutable}")
         dest.parentFile.mkdirs()
         def outStream = new BufferedOutputStream(new FileOutputStream(dest))
         def buf = new byte[1024]
