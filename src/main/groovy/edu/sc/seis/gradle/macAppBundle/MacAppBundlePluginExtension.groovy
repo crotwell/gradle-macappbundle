@@ -79,6 +79,12 @@ class MacAppBundlePluginExtension implements Serializable {
      */
     String extras = ""
     
+    /** for codesign */
+    String certIdentity
+    
+    /** for codesign */
+    String codeSignCmd = "codesign"
+    
     public File getPlistFileForProject(Project project) {
         return project.file("${project.buildDir}/${outputDir}/${appName}.app/Contents/Info.plist")
     }
@@ -109,6 +115,8 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((bundleInfoDictionaryVersion == null) ? 0 : bundleInfoDictionaryVersion.hashCode());
         result = prime * result + ((bundleDevelopmentRegion == null) ? 0 : bundleDevelopmentRegion.hashCode());
         result = prime * result + ((extras == null) ? 0 : extras.hashCode());
+        result = prime * result + ((certIdentity == null) ? 0 : certIdentity.hashCode());
+        result = prime * result + ((codeSignCmd == null) ? 0 : codeSignCmd.hashCode());
         return result;
     }
 
@@ -183,7 +191,6 @@ class MacAppBundlePluginExtension implements Serializable {
                 return false;
         } else if (!bundlePackageType.equals(other.bundlePackageType))
             return false;
-            
         if (bundleInfoDictionaryVersion == null) {
             if (other.bundleInfoDictionaryVersion != null)
                 return false;
@@ -193,6 +200,16 @@ class MacAppBundlePluginExtension implements Serializable {
             if (other.bundleDevelopmentRegion != null)
                 return false;
         } else if (!bundleDevelopmentRegion.equals(other.bundleDevelopmentRegion))
+            return false;
+        if (certIdentity == null) {
+            if (other.certIdentity != null)
+                return false;
+        } else if (!certIdentity.equals(other.certIdentity))
+            return false;
+        if (codeSignCmd == null) {
+            if (other.codeSignCmd != null)
+                return false;
+        } else if (!codeSignCmd.equals(other.codeSignCmd))
             return false;
         if (useScreenMenuBar != other.useScreenMenuBar)
             return false;
