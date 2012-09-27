@@ -34,7 +34,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
         xml.plist(version:"0.9") {
             dict() {
                 key('CFBundleName')
-                string(project.name)
+                string(extension.appName)
                 key('CFBundleIdentifier')
                 string(extension.mainClassName)
                 key('CFBundleVersion')
