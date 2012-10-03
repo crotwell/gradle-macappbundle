@@ -19,7 +19,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     static final String TASK_CONFIGURE_NAME = "configMacApp"
     static final String TASK_INFO_PLIST_GENERATE_NAME = "generatePlist"
     static final String TASK_PKG_INFO_GENERATE_NAME = "generatePkgInfo"
-    
+
     static final String TASK_LIB_COPY_NAME = "copyToResourcesJava"
     static final String TASK_COPY_STUB_NAME = "copyStub"
     static final String TASK_COPY_ICON_NAME = "copyIcon"
@@ -27,13 +27,13 @@ class MacAppBundlePlugin implements Plugin<Project> {
     static final String TASK_CREATE_APP_NAME = "createApp"
     static final String TASK_CODE_SIGN_NAME = "codeSign"
     static final String TASK_CREATE_DMG = "createDmg"
-    
+
 
     def void apply(Project project) {
         project.plugins.apply(JavaPlugin)
         MacAppBundlePluginExtension pluginExtension = new MacAppBundlePluginExtension()
         project.extensions.macAppBundle = pluginExtension
-        
+
         Task configTask = addConfigurationTask(project)
         Task plistTask = addCreateInfoPlistTask(project)
         plistTask.dependsOn(configTask)
@@ -56,7 +56,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         /* I think setfile is not required for a .app to be run on osx.
          * Leaving the task in, but not depended on by anything else. If
          * SetFile is needed, then switch the above depends to
-        createAppTask.dependsOn(setFileTask)
+         createAppTask.dependsOn(setFileTask)
          */
         Task codeSignTask = addCodeSignTask(project)
         codeSignTask.dependsOn(createAppTask)
@@ -111,7 +111,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.into "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/Resources"
         return task
     }
-    
+
     private Task createPkgInfoTask(Project project) {
         Task task = project.tasks.add(TASK_PKG_INFO_GENERATE_NAME, PkgInfoTask)
         task.description = "Creates the Info.plist configuration file inside the mac osx .app directory."
@@ -139,8 +139,14 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.description = "Runs codesign on the .app (not required)"
         task.group = GROUP
         task.doFirst {
+            if ( ! project.macAppBundle.certIdentity) {
+                throw new org.gradle.api.GradleException("No value has been specified for property certIdentity")
+            }
             workingDir = project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}")
             commandLine "${->project.macAppBundle.codeSignCmd}", "-s", "${->project.macAppBundle.certIdentity}", "-f", "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app"
+            if (project.macAppBundle.keyChain) {
+                commandLine << "--keychain" << "${->project.macAppBundle.keyChain}"
+            }
         }
         task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
         task.outputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
@@ -154,9 +160,9 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.doFirst {
             workingDir = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}")
             commandLine "hdiutil", "create", "-srcfolder",
-               project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}"),
-               "-volname", "${->project.macAppBundle.volumeName}",
-               "${->project.macAppBundle.dmgName}"
+                    project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}"),
+                    "-volname", "${->project.macAppBundle.volumeName}",
+                    "${->project.macAppBundle.dmgName}"
             def dmgFile = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}/${->project.macAppBundle.dmgName}.dmg")
             if (dmgFile.exists()) dmgFile.delete()
         }
