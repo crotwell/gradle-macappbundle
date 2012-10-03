@@ -13,13 +13,13 @@ class GenerateInfoPlistTask  extends DefaultTask {
 
     static final String XML_DEF_LINE = '<?xml version="1.0" encoding="UTF-8"?>';
     static final String DOCTYPE_LINE = '<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">'
-    
-    
+
+
     @OutputFile
     File getPlistFile() {
         return project.macAppBundle.getPlistFileForProject(project)
     }
-    
+
     @TaskAction
     def void writeInfoPlist() {
         MacAppBundlePluginExtension extension = project.macAppBundle
@@ -60,14 +60,22 @@ class GenerateInfoPlistTask  extends DefaultTask {
                     key('JVMVersion')
                     string(extension.jvmVersion)
                     key('ClassPath')
-                    array() {
-                        classpath.sort().each() { val -> string('$JAVAROOT/'+val ) }
-                    }
+                    doValue(xml, classpath.sort().collect { val -> '$JAVAROOT/'+val  })
                     key('Properties')
                     dict {
-                        key('apple.laf.useScreenMenuBar')
-                        string(extension.useScreenMenuBar)
+                        extension.javaProperties.each { k, v->
+                            key("$k")
+                            doValue(xml, v)
+                        }
                     }
+                    extension.javaExtras.each { k, v->
+                        key("$k")
+                        doValue(xml, v)
+                    }
+                }
+                extension.bundleExtras.each { k, v->
+                    key("$k")
+                    doValue(xml, v)
                 }
                 if (extension.extras != null) {
                     xml.getPrinter().with { p -> p.println(extension.extras) }
@@ -76,5 +84,29 @@ class GenerateInfoPlistTask  extends DefaultTask {
         }
         writer.close()
     }
-    
+
+    def doValue(xml, value)  {
+        if (value instanceof String || value instanceof Short || value instanceof Integer || value instanceof Float || value instanceof Double)  {
+            xml.string("$value")
+        } else if (value instanceof Boolean) {
+            if (value) {
+                xml.string("true")
+            } else {
+                xml.string("false")
+            }
+        } else if (value instanceof Map) {
+            xml.dict {
+                value.each { subk, subv ->
+                    key("$subk")
+                    doValue(xml, subv)
+                }
+            }
+        } else if (value instanceof List || value instanceof Object[]) {
+            xml.array {
+                value.each { subv ->
+                    doValue(xml, subv)
+                }
+            }
+        } else throw new RuntimeException("unknown type for plist: "+value)
+    }
 }
