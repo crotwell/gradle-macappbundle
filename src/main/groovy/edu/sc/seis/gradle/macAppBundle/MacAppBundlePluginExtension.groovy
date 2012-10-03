@@ -128,10 +128,13 @@ class MacAppBundlePluginExtension implements Serializable {
     }
     
     /** for codesign */
-    String certIdentity
+    String certIdentity = null
     
     /** for codesign */
     String codeSignCmd = "codesign"
+    
+    /** for codesign */
+    String keyChain = null
     
     public File getPlistFileForProject(Project project) {
         return project.file("${project.buildDir}/${appOutputDir}/${appName}.app/Contents/Info.plist")
@@ -168,6 +171,7 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((extras == null) ? 0 : extras.hashCode());
         result = prime * result + ((certIdentity == null) ? 0 : certIdentity.hashCode());
         result = prime * result + ((codeSignCmd == null) ? 0 : codeSignCmd.hashCode());
+        result = prime * result + ((keyChain == null) ? 0 : keyChain.hashCode());
         return result;
     }
 
@@ -266,6 +270,11 @@ class MacAppBundlePluginExtension implements Serializable {
             if (other.codeSignCmd != null)
                 return false;
         } else if (!codeSignCmd.equals(other.codeSignCmd))
+            return false;
+        if (keyChain == null) {
+            if (other.keyChain != null)
+                return false;
+        } else if (!keyChain.equals(other.keyChain))
             return false;
             
         if (javaProperties == null) {
