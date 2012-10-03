@@ -5,6 +5,7 @@ version "1.0.8-SNAPSHOT"
 apply plugin: 'groovy'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
+apply from: "https://launchpad.net/gradle-release/trunk/latest/+download/apply.groovy"
 
 dependencies {
     compile gradleApi()
