@@ -62,6 +62,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         codeSignTask.dependsOn(createAppTask)
         Task dmgTask = addDmgTask(project)
         dmgTask.dependsOn(createAppTask)
+        project.getTasksByName("assemble", true).each{ t -> t.dependsOn(dmgTask) }
     }
 
     private Task addConfigurationTask(Project project) {
@@ -89,7 +90,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.description = "Copies the project dependency jars in the Contents/Resorces/Java directory."
         task.group = GROUP
         task.with configureDistSpec(project)
-        task.into { project.file("${project.buildDir}/${project.macAppBundle.outputDir}/${->project.macAppBundle.appName}.app/Contents/Resources/Java") }
+        task.into { project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/Resources/Java") }
         return task
     }
 
@@ -97,8 +98,8 @@ class MacAppBundlePlugin implements Plugin<Project> {
         Task task = project.tasks.add(TASK_COPY_STUB_NAME, CopyJavaStubTask)
         task.description = "Copies the JavaApplicationStub into the Contents/MacOS directory."
         task.group = GROUP
-        task.doLast { ant.chmod(dir: project.file("${project.buildDir}/${project.macAppBundle.outputDir}/${->project.macAppBundle.appName}.app/Contents/MacOS"), perm: "755", includes: "*") }
-        task.outputs.file("${->project.buildDir}/${->project.macAppBundle.outputDir}/${->project.macAppBundle.appName}.app/Contents/MacOS/JavaApplicationStub")
+        task.doLast { ant.chmod(dir: project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/MacOS"), perm: "755", includes: "*") }
+        task.outputs.file("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/MacOS/JavaApplicationStub")
         return task
     }
 
@@ -107,7 +108,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.description = "Copies the icon into the Contents/MacOS directory."
         task.group = GROUP
         task.from "${->project.macAppBundle.icon}"
-        task.into "${->project.buildDir}/${->project.macAppBundle.outputDir}/${->project.macAppBundle.appName}.app/Contents/Resources"
+        task.into "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/Resources"
         return task
     }
     
@@ -125,11 +126,11 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.description = "Runs SetFile to toggle the magic bit on the .app (probably not needed)"
         task.group = GROUP
         task.doFirst {
-            workingDir = project.file("${project.buildDir}/${project.macAppBundle.outputDir}")
+            workingDir = project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}")
             commandLine "${->project.macAppBundle.setFileCmd}", "-a", "B", "${->project.macAppBundle.appName}.app"
         }
-        task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.outputDir}/${->project.macAppBundle.appName}.app")
-        task.outputs.dir("${->project.buildDir}/${->project.macAppBundle.outputDir}/${->project.macAppBundle.appName}.app")
+        task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
+        task.outputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
         return task
     }
 
@@ -138,11 +139,11 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.description = "Runs codesign on the .app (not required)"
         task.group = GROUP
         task.doFirst {
-            workingDir = project.file("${project.buildDir}/${project.macAppBundle.outputDir}")
-            commandLine "${->project.macAppBundle.codeSignCmd}", "-s", "${->project.macAppBundle.certIdentity}", "-f", "${->project.buildDir}/${->project.macAppBundle.outputDir}/${->project.macAppBundle.appName}.app"
+            workingDir = project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}")
+            commandLine "${->project.macAppBundle.codeSignCmd}", "-s", "${->project.macAppBundle.certIdentity}", "-f", "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app"
         }
-        task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.outputDir}/${->project.macAppBundle.appName}.app")
-        task.outputs.dir("${->project.buildDir}/${->project.macAppBundle.outputDir}/${->project.macAppBundle.appName}.app")
+        task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
+        task.outputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
         return task
     }
 
@@ -151,18 +152,18 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.description = "Create a dmg containing the .app"
         task.group = GROUP
         task.doFirst {
-            workingDir = project.file("${project.buildDir}/distributions")
+            workingDir = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}")
             commandLine "hdiutil", "create", "-srcfolder",
-             project.file("${project.buildDir}/${project.macAppBundle.outputDir}"),
-              "-volname", "${->project.macAppBundle.volumeName}",
-              "${->project.macAppBundle.dmgName}"
-              def dmgFile = project.file("${->project.macAppBundle.dmgName}.dmg")
-              if (dmgFile.exists()) dmgFile.delete()
+               project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}"),
+               "-volname", "${->project.macAppBundle.volumeName}",
+               "${->project.macAppBundle.dmgName}"
+            def dmgFile = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}/${->project.macAppBundle.dmgName}.dmg")
+            if (dmgFile.exists()) dmgFile.delete()
         }
-        task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.outputDir}/${->project.macAppBundle.appName}.app")
-        task.outputs.file("${->project.buildDir}/distributions/${->project.macAppBundle.dmgName}.dmg")
+        task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
+        task.outputs.file("${->project.buildDir}/${project.macAppBundle.dmgOutputDir}/${->project.macAppBundle.dmgName}.dmg")
         task.doFirst { task.outputs.files.each { it.delete() } }
-        task.doFirst { project.file("${->project.buildDir}/distributions").mkdirs()}
+        task.doFirst { project.file("${->project.buildDir}/${project.macAppBundle.dmgOutputDir}").mkdirs()}
         return task
     }
 

@@ -16,15 +16,32 @@ class MacAppBundlePluginExtension implements Serializable {
         if (volumeName == null) volumeName = "${->project.name}-${->project.version}"
         if (dmgName == null) dmgName = "${->project.name}-${->project.version}"
         if (jvmVersion == null) jvmVersion = project.targetCompatibility.toString()+"+"
+        if (dmgOutputDir == null) dmgOutputDir = "${->project.distsDirName}"
     }
     
-    /** The command SetFile, usually located in /Devloper/Tools, that sets the magic bit on a .app directory
+    /** The command SetFile, usually located in /Developer/Tools, that sets the magic bit on a .app directory
      * to turn it into a OSX Application.
      */
     String setFileCmd = "/Developer/Tools/SetFile"
     
+    /** The output directory for building the app. WARNING: Replaced by new appOutputDir. */
+    String outputDir = null
+    
+    @Deprecated
+    def setOutputDir(String val) {
+        System.err.println("outputDir is deprecated, please use appOutputDir or dmgOutputDir")
+        appOutputDir = val;
+    }
+    @Deprecated
+    def getOutputDir() {
+        throw new RuntimeException("outputDir is deprecated, please use appOutputDir");
+    }
+    
     /** The output directory for building the app */
-    String outputDir = "macApp"
+    String appOutputDir = "macApp"
+    
+    /** The output directory for building the dmg */
+    String dmgOutputDir
 
     /** The initial class to start the application, must contain a public static void main method. */ 
     String mainClassName
@@ -50,10 +67,31 @@ class MacAppBundlePluginExtension implements Serializable {
     /** The base name of the dmg file, without the .dmg extension. */
     String dmgName
     
+    /** Map of properties to be put in the Properties dict inside the Java dict. Usage should be like
+        javaProperties.put("apple.laf.useScreenMenuBar", "true") */
+    Map javaProperties = ["apple.laf.useScreenMenuBar" : "true"]
+    
+    /** Map of extra java key-value pairs to be put in the java level dict inside Info.plist. Usage should be like
+        javaExtras.put("mykey", "myvalue") */
+    Map javaExtras = [:]
+    
+    /** Map of extra bundle key-value pairs to be put in the top level dict inside Info.plist. Usage should be like
+        bundleExtras.put("mykey", "myvalue") */
+    Map bundleExtras = [:]
+    
     /** Should the app use the Mac default of a single screen menubar (true) or a menubar per window (false). 
-     * Default is true.
+     * Default is true. Deprecated, use javaProperties.put("apple.laf.useScreenMenuBar", "true")
      */
     boolean useScreenMenuBar = true
+    
+    @Deprecated
+    def setUseScreenMenuBar(String val) {
+        appOutputDir = val;
+    }
+    @Deprecated
+    def getUseScreenMenuBar() {
+        throw new RuntimeException("useScreenMenuBar is deprecated, please use javaProperties.[\"apple.laf.useScreenMenuBar\"]");
+    }
     
     /** The name of the executable run by the bundle.
      * Default is 'JavaApplicationStub'.
@@ -74,10 +112,20 @@ class MacAppBundlePluginExtension implements Serializable {
      */
     String bundleDevelopmentRegion = 'English'
     
-    /** Any extra xml that should be included in the info.plist file. Will be added
+    /** WARNING: Deprecated, use bundleProperties instead. Any extra xml that should be included in the info.plist file. Will be added
      *  to the bottom inside the outermost <dict> element.
      */
     String extras = ""
+    
+    @Deprecated
+    def setExtras(String val) {
+        System.err.println("extras is deprecated, please use the bundleExtras map instead.");
+        appOutputDir = val;
+    }
+    @Deprecated
+    def getExtras() {
+        return extras;
+    }
     
     /** for codesign */
     String certIdentity
@@ -86,11 +134,11 @@ class MacAppBundlePluginExtension implements Serializable {
     String codeSignCmd = "codesign"
     
     public File getPlistFileForProject(Project project) {
-        return project.file("${project.buildDir}/${outputDir}/${appName}.app/Contents/Info.plist")
+        return project.file("${project.buildDir}/${appOutputDir}/${appName}.app/Contents/Info.plist")
     }
     
     public File getPkgInfoFileForProject(Project project) {
-        return project.file("${project.buildDir}/${outputDir}/${appName}.app/Contents/PkgInfo")
+        return project.file("${project.buildDir}/${appOutputDir}/${appName}.app/Contents/PkgInfo")
     }
     
 
@@ -102,13 +150,16 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((icon == null) ? 0 : icon.hashCode());
         result = prime * result + ((jvmVersion == null) ? 0 : jvmVersion.hashCode());
         result = prime * result + ((mainClassName == null) ? 0 : mainClassName.hashCode());
-        result = prime * result + ((outputDir == null) ? 0 : outputDir.hashCode());
+        result = prime * result + ((appOutputDir == null) ? 0 : appOutputDir.hashCode());
+        result = prime * result + ((dmgOutputDir == null) ? 0 : dmgOutputDir.hashCode());
         result = prime * result + ((setFileCmd == null) ? 0 : setFileCmd.hashCode());
         result = prime * result + ((backgroundImage == null) ? 0 : backgroundImage.hashCode());
         result = prime * result + ((appName == null) ? 0 : appName.hashCode());
         result = prime * result + ((volumeName == null) ? 0 : volumeName.hashCode());
         result = prime * result + ((dmgName == null) ? 0 : dmgName.hashCode());
-        result = prime * result + (useScreenMenuBar ? 1231 : 1237);
+        result = prime * result + (javaProperties == null ? 0 : javaProperties.hashCode);
+        result = prime * result + (javaExtras == null ? 0 : javaExtras.hashCode);
+        result = prime * result + (bundleExtras == null ? 0 : bundleExtras.hashCode);
         result = prime * result + ((bundleExecutable == null) ? 0 : bundleExecutable.hashCode());
         result = prime * result + (bundleAllowMixedLocalizations ? 1231 : 1237);
         result = prime * result + ((bundlePackageType == null) ? 0 : bundlePackageType.hashCode());
@@ -149,10 +200,15 @@ class MacAppBundlePluginExtension implements Serializable {
                 return false;
         } else if (!mainClassName.equals(other.mainClassName))
             return false;
-        if (outputDir == null) {
-            if (other.outputDir != null)
+        if (appOutputDir == null) {
+            if (other.appOutputDir != null)
                 return false;
-        } else if (!outputDir.equals(other.outputDir))
+        } else if (!appOutputDir.equals(other.appOutputDir))
+            return false;
+        if (dmgOutputDir == null) {
+            if (other.dmgOutputDir != null)
+                return false;
+        } else if (!dmgOutputDir.equals(other.dmgOutputDir))
             return false;
         if (setFileCmd == null) {
             if (other.setFileCmd != null)
@@ -211,7 +267,21 @@ class MacAppBundlePluginExtension implements Serializable {
                 return false;
         } else if (!codeSignCmd.equals(other.codeSignCmd))
             return false;
-        if (useScreenMenuBar != other.useScreenMenuBar)
+            
+        if (javaProperties == null) {
+            if (other.javaProperties != null)
+                return false;
+        } else if (!javaProperties.equals(other.javaProperties))
+            return false;
+        if (javaExtras == null) {
+            if (other.javaExtras != null)
+                return false;
+        } else if (!javaExtras.equals(other.javaExtras))
+            return false;
+        if (bundleExtras == null) {
+            if (other.bundleExtras != null)
+                return false;
+        } else if (!bundleExtras.equals(other.bundleExtras))
             return false;
         if (extras == null) {
             if (other.extras != null)
