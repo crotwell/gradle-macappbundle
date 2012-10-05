@@ -127,7 +127,10 @@ class MacAppBundlePluginExtension implements Serializable {
     }
     @Deprecated
     def getExtras() {
-        throw new GradleException("extras is deprecated, please use the bundleExtras map instead.")
+        if (extras != null) {
+            System.err.println("extras is deprecated, please use the bundleExtras map instead.")
+        }
+        return extras
     }
     
     /** for codesign */
