@@ -2,6 +2,7 @@ package edu.sc.seis.gradle.macAppBundle
 
 import java.io.File;
 
+import org.gradle.api.GradleException
 import org.gradle.api.Project;
 
 
@@ -35,7 +36,7 @@ class MacAppBundlePluginExtension implements Serializable {
     }
     @Deprecated
     def getOutputDir() {
-        throw new RuntimeException("outputDir is deprecated, please use appOutputDir");
+        throw new GradleException("outputDir is deprecated, please use appOutputDir");
     }
     
     /** The output directory for building the app */
@@ -87,11 +88,12 @@ class MacAppBundlePluginExtension implements Serializable {
     
     @Deprecated
     def setUseScreenMenuBar(String val) {
-        appOutputDir = val;
+        System.err.println("useScreenMenuBar is deprecated, please use javaProperties.[\"apple.laf.useScreenMenuBar\"]")
+        javaProperties["apple.laf.useScreenMenuBar"] = val;
     }
     @Deprecated
     def getUseScreenMenuBar() {
-        throw new RuntimeException("useScreenMenuBar is deprecated, please use javaProperties.[\"apple.laf.useScreenMenuBar\"]");
+        throw new GradleException("useScreenMenuBar is deprecated, please use javaProperties.[\"apple.laf.useScreenMenuBar\"]");
     }
     
     /** The name of the executable run by the bundle.
@@ -120,12 +122,12 @@ class MacAppBundlePluginExtension implements Serializable {
     
     @Deprecated
     def setExtras(String val) {
-        System.err.println("extras is deprecated, please use the bundleExtras map instead.");
-        appOutputDir = val;
+        System.err.println("extras is deprecated, please use the bundleExtras map instead.")
+        extras = val
     }
     @Deprecated
     def getExtras() {
-        return extras;
+        throw new GradleException("extras is deprecated, please use the bundleExtras map instead.")
     }
     
     /** for codesign */
