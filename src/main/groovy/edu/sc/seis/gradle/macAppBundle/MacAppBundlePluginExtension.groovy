@@ -19,10 +19,11 @@ class MacAppBundlePluginExtension implements Serializable {
         if (dmgOutputDir == null) dmgOutputDir = "${->project.distsDirName}"
     }
     
-    /** The command SetFile, usually located in /Developer/Tools, that sets the magic bit on a .app directory
-     * to turn it into a OSX Application.
+    /** The command SetFile, usually located in /usr/bin, but might be in /Developer/Tools,
+     *  that sets the magic bit on a .app directory to turn it into a OSX Application.
+     *  This does not seem to be required to generate a recognizable .app application.
      */
-    String setFileCmd = "/Developer/Tools/SetFile"
+    String setFileCmd = "/usr/bin/SetFile"
     
     /** The output directory for building the app. WARNING: Replaced by new appOutputDir. */
     String outputDir = null
