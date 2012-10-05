@@ -39,10 +39,10 @@ class MacAppBundlePluginExtension implements Serializable {
         throw new GradleException("outputDir is deprecated, please use appOutputDir");
     }
     
-    /** The output directory for building the app */
+    /** The output directory for building the app, relative to the build directory. */
     String appOutputDir = "macApp"
     
-    /** The output directory for building the dmg */
+    /** The output directory for building the dmg, relative to the build directory. */
     String dmgOutputDir
 
     /** The initial class to start the application, must contain a public static void main method. */ 
