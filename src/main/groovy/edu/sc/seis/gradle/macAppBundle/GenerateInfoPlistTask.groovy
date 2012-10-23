@@ -3,6 +3,7 @@ package edu.sc.seis.gradle.macAppBundle
 import java.io.File;
 
 import org.gradle.api.DefaultTask;
+import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.tasks.OutputFile;
 import org.gradle.api.tasks.TaskAction;
 
@@ -107,6 +108,6 @@ class GenerateInfoPlistTask  extends DefaultTask {
                     doValue(xml, subv)
                 }
             }
-        } else throw new RuntimeException("unknown type for plist: "+value)
+        } else throw new InvalidUserDataException("unknown type for plist: "+value)
     }
 }
