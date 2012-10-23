@@ -3,6 +3,7 @@ package edu.sc.seis.gradle.macAppBundle;
 import org.gradle.api.Project
 import org.gradle.api.Plugin
 import org.gradle.api.Task
+import org.gradle.api.InvalidUserDataException;
 import org.gradle.api.file.CopySpec
 import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.tasks.JavaExec;
@@ -141,7 +142,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.group = GROUP
         task.doFirst {
             if ( ! project.macAppBundle.certIdentity) {
-                throw new org.gradle.api.GradleException("No value has been specified for property certIdentity")
+                throw new InvalidUserDataException("No value has been specified for property certIdentity")
             }
             workingDir = project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}")
             commandLine "${->project.macAppBundle.codeSignCmd}", "-s", "${->project.macAppBundle.certIdentity}", "-f", "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app"

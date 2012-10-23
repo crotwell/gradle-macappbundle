@@ -36,7 +36,7 @@ class MacAppBundlePluginExtension implements Serializable {
     }
     @Deprecated
     def getOutputDir() {
-        throw new GradleException("outputDir is deprecated, please use appOutputDir");
+        throw new InvalidUserDataException("outputDir is deprecated, please use appOutputDir");
     }
     
     /** The output directory for building the app, relative to the build directory. */
@@ -93,7 +93,7 @@ class MacAppBundlePluginExtension implements Serializable {
     }
     @Deprecated
     def getUseScreenMenuBar() {
-        throw new GradleException("useScreenMenuBar is deprecated, please use javaProperties.[\"apple.laf.useScreenMenuBar\"]");
+        throw new InvalidUserDataException("useScreenMenuBar is deprecated, please use javaProperties.[\"apple.laf.useScreenMenuBar\"]");
     }
     
     /** The name of the executable run by the bundle.
