@@ -1,6 +1,5 @@
 
 group "edu.sc.seis"
-version "1.0.8-SNAPSHOT"
 
 apply plugin: 'groovy'
 apply plugin: 'eclipse'
