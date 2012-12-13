@@ -3,6 +3,7 @@ package edu.sc.seis.gradle.macAppBundle
 import java.io.File;
 
 import org.gradle.api.GradleException
+import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project;
 
 
