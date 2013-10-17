@@ -10,6 +10,7 @@ import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.Sync;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Exec;
+import org.gradle.api.tasks.bundling.Zip;
 
 
 class MacAppBundlePlugin implements Plugin<Project> {
@@ -28,6 +29,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     static final String TASK_CREATE_APP_NAME = "createApp"
     static final String TASK_CODE_SIGN_NAME = "codeSign"
     static final String TASK_CREATE_DMG = "createDmg"
+    static final String TASK_CREATE_ZIP = "createAppZip"
 
 
     def void apply(Project project) {
@@ -67,7 +69,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addConfigurationTask(Project project) {
-        Task task = project.tasks.add(TASK_CONFIGURE_NAME)
+        Task task = project.tasks.create(TASK_CONFIGURE_NAME)
         task.description = "Sets default configuration values for the extension."
         task.group = GROUP
         task.doFirst {
@@ -77,7 +79,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addCreateInfoPlistTask(Project project) {
-        Task task = project.tasks.add(TASK_INFO_PLIST_GENERATE_NAME, GenerateInfoPlistTask)
+        Task task = project.tasks.create(TASK_INFO_PLIST_GENERATE_NAME, GenerateInfoPlistTask)
         task.description = "Creates the Info.plist configuration file inside the mac osx .app directory."
         task.group = GROUP
         task.inputs.property("project version", project.version)
@@ -87,7 +89,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addCopyToLibTask(Project project) {
-        Sync task = project.tasks.add(TASK_LIB_COPY_NAME, Sync)
+        Sync task = project.tasks.create(TASK_LIB_COPY_NAME, Sync)
         task.description = "Copies the project dependency jars in the Contents/Resorces/Java directory."
         task.group = GROUP
         task.with configureDistSpec(project)
@@ -96,7 +98,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addCopyStubTask(Project project) {
-        Task task = project.tasks.add(TASK_COPY_STUB_NAME, CopyJavaStubTask)
+        Task task = project.tasks.create(TASK_COPY_STUB_NAME, CopyJavaStubTask)
         task.description = "Copies the JavaApplicationStub into the Contents/MacOS directory."
         task.group = GROUP
         task.doLast { ant.chmod(dir: project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/MacOS"), perm: "755", includes: "*") }
@@ -106,7 +108,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addCopyIconTask(Project project) {
-        Task task = project.tasks.add(TASK_COPY_ICON_NAME, Copy)
+        Task task = project.tasks.create(TASK_COPY_ICON_NAME, Copy)
         task.description = "Copies the icon into the Contents/MacOS directory."
         task.group = GROUP
         task.from "${->project.macAppBundle.icon}"
@@ -115,7 +117,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task createPkgInfoTask(Project project) {
-        Task task = project.tasks.add(TASK_PKG_INFO_GENERATE_NAME, PkgInfoTask)
+        Task task = project.tasks.create(TASK_PKG_INFO_GENERATE_NAME, PkgInfoTask)
         task.description = "Creates the Info.plist configuration file inside the mac osx .app directory."
         task.group = GROUP
         task.inputs.property("creator code", { project.macAppBundle.creatorCode } )
@@ -124,7 +126,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addSetFileTask(Project project) {
-        def task = project.tasks.add(TASK_SET_FILE_NAME, Exec)
+        def task = project.tasks.create(TASK_SET_FILE_NAME, Exec)
         task.description = "Runs SetFile to toggle the magic bit on the .app (probably not needed)"
         task.group = GROUP
         task.doFirst {
@@ -137,7 +139,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addCodeSignTask(Project project) {
-        def task = project.tasks.add(TASK_CODE_SIGN_NAME, Exec)
+        def task = project.tasks.create(TASK_CODE_SIGN_NAME, Exec)
         task.description = "Runs codesign on the .app (not required)"
         task.group = GROUP
         task.doFirst {
@@ -156,7 +158,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addDmgTask(Project project) {
-        def task = project.tasks.add(TASK_CREATE_DMG, Exec)
+        def task = project.tasks.create(TASK_CREATE_DMG, Exec)
         task.description = "Create a dmg containing the .app"
         task.group = GROUP
         task.doFirst {
@@ -176,7 +178,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private Task addCreateAppTask(Project project) {
-        def task = project.tasks.add(TASK_CREATE_APP_NAME)
+        def task = project.tasks.create(TASK_CREATE_APP_NAME)
         task.description = "Placeholder task for tasks relating to creating .app applications"
         task.group = GROUP
         return task
