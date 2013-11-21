@@ -1,5 +1,5 @@
 
-group "edu.sc.seis.gradle.macappbundle"
+group "edu.sc.seis.gradle"
 
 apply plugin: 'groovy'
 apply plugin: 'eclipse'
