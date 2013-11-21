@@ -1,6 +1,7 @@
 package edu.sc.seis.gradle.macAppBundle
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.InvalidUserDataException;
@@ -87,13 +88,21 @@ class GenerateInfoPlistTask  extends DefaultTask {
     }
 
     def doValue(xml, value)  {
-        if (value instanceof String || value instanceof Short || value instanceof Integer || value instanceof Float || value instanceof Double)  {
+        if (value instanceof String)  {
             xml.string("$value")
+        } else if (value instanceof Date)  {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+            xml.date(sdf.format(value));
+            //YYYY-MM-DD HH:MM:SS 
+        } else if (value instanceof Short || value instanceof Integer)  {
+            xml.integer(value)
+        } else if (value instanceof Float || value instanceof Double)  {
+            xml.real(value)
         } else if (value instanceof Boolean) {
             if (value) {
-                xml.string("true")
+                xml.true()
             } else {
-                xml.string("false")
+                xml.false()
             }
         } else if (value instanceof Map) {
             xml.dict {
