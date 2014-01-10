@@ -19,7 +19,7 @@ class MacAppBundlePluginExtension implements Serializable {
         if (dmgName == null) dmgName = "${->project.name}-${->project.version}"
         if (jvmVersion == null) jvmVersion = project.targetCompatibility.toString()+"+"
         if (dmgOutputDir == null) dmgOutputDir = "${->project.distsDirName}"
-        setAppStyle('Apple')
+        setAppStyle(appStyle)
     }
     
     /** The style of .app created. Use 'Apple' for the original Apple Java in OSX 10.8 and earlier. Starting in
