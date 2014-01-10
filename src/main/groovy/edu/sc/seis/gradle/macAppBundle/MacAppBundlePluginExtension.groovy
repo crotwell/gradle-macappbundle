@@ -19,6 +19,27 @@ class MacAppBundlePluginExtension implements Serializable {
         if (dmgName == null) dmgName = "${->project.name}-${->project.version}"
         if (jvmVersion == null) jvmVersion = project.targetCompatibility.toString()+"+"
         if (dmgOutputDir == null) dmgOutputDir = "${->project.distsDirName}"
+        setAppStyle('Apple')
+    }
+    
+    /** The style of .app created. Use 'Apple' for the original Apple Java in OSX 10.8 and earlier. Starting in
+    OSX 10.9 there can be either Apple Java (1.6) or Oracle Java (1.7) and the internals of the Info.plist and
+    the executable stub are different. The default is 'Apple'. Setting this to 'Oracle' will also change the 
+    bundleExecutable to be the Oracle JavaAppLauncher instead of and the jarSubdir to be Java.
+    
+    More information on the new Oracle style .app can be found <a href="https://java.net/projects/appbundler">here</a>.
+    */
+    String appStyle = 'Apple'
+    
+    def setAppStyle(String val) {
+        appStyle = val
+        if (val == 'Oracle') {
+            bundleExecutable = 'JavaAppLauncher'
+            jarSubdir = 'Java'
+        } else if (val == 'Apple') {
+            bundleExecutable = 'JavaApplicationStub'
+            jarSubdir = 'Resources/Java'
+        }
     }
     
     /** The command SetFile, usually located in /usr/bin, but might be in /Developer/Tools,
@@ -81,6 +102,11 @@ class MacAppBundlePluginExtension implements Serializable {
     /** Map of extra bundle key-value pairs to be put in the top level dict inside Info.plist. Usage should be like
         bundleExtras.put("mykey", "myvalue") */
     Map bundleExtras = [:]
+    
+    /** List of arguments to pass to the application. Only used for Oracle-style apps. */
+    List arguments = []
+    
+    String jarSubdir = 'Resources/Java'
     
     /** Should the app use the Mac default of a single screen menubar (true) or a menubar per window (false). 
      * Default is true. Deprecated, use javaProperties.put("apple.laf.useScreenMenuBar", "true")
@@ -176,6 +202,7 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((bundleInfoDictionaryVersion == null) ? 0 : bundleInfoDictionaryVersion.hashCode());
         result = prime * result + ((bundleDevelopmentRegion == null) ? 0 : bundleDevelopmentRegion.hashCode());
         result = prime * result + ((extras == null) ? 0 : extras.hashCode());
+        result = prime * result + ((arguments == null) ? 0 : arguments.hashCode());
         result = prime * result + ((certIdentity == null) ? 0 : certIdentity.hashCode());
         result = prime * result + ((codeSignCmd == null) ? 0 : codeSignCmd.hashCode());
         result = prime * result + ((keyChain == null) ? 0 : keyChain.hashCode());
@@ -298,6 +325,11 @@ class MacAppBundlePluginExtension implements Serializable {
             if (other.bundleExtras != null)
                 return false;
         } else if (!bundleExtras.equals(other.bundleExtras))
+            return false;
+        if (arguments == null) {
+            if (other.arguments != null)
+                return false;
+        } else if (!arguments.equals(other.arguments))
             return false;
         if (extras == null) {
             if (other.extras != null)

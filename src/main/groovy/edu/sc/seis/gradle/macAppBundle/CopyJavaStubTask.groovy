@@ -13,8 +13,8 @@ class CopyJavaStubTask extends DefaultTask {
         dest.parentFile.mkdirs()
         def outStream = new BufferedOutputStream(new FileOutputStream(dest))
         def buf = new byte[1024]
-        def inStream = this.getClass().getClassLoader().getResourceAsStream("edu/sc/seis/macAppBundle/JavaApplicationStub")
-        if (inStream == null) throw new RuntimeException("Can't find resource for JavaApplicationStub in jar")
+        def inStream = this.getClass().getClassLoader().getResourceAsStream("edu/sc/seis/macAppBundle/${project.macAppBundle.bundleExecutable}")
+        if (inStream == null) throw new RuntimeException("Can't find resource for ${project.macAppBundle.bundleExecutable} in jar")
         int numRead = inStream.read(buf)
         while (numRead > 0) {
             outStream.write(buf, 0, numRead)
