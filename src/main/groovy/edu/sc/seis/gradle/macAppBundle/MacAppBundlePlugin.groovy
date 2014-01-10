@@ -59,12 +59,15 @@ class MacAppBundlePlugin implements Plugin<Project> {
         /* I think setfile is not required for a .app to be run on osx.
          * Leaving the task in, but not depended on by anything else. If
          * SetFile is needed, then switch the above depends to
-         createAppTask.dependsOn(setFileTask)
+         setFileTask.dependsOn(createAppTask)
          */
+        setFileTask.mustRunAfter(createAppTask)
         Task codeSignTask = addCodeSignTask(project)
         codeSignTask.dependsOn(createAppTask)
         Task dmgTask = addDmgTask(project)
         dmgTask.dependsOn(createAppTask)
+        dmgTask.mustRunAfter codeSignTask
+        dmgTask.mustRunAfter setFileTask
         project.getTasksByName("assemble", true).each{ t -> t.dependsOn(dmgTask) }
     }
 

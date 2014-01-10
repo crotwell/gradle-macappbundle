@@ -87,9 +87,6 @@ class GenerateInfoPlistTask  extends DefaultTask {
                     key("$k")
                     doValue(xml, v)
                 }
-                if (extension.extras != null) {
-                    xml.getPrinter().with { p -> p.println(extension.extras) }
-                }
             }
         }
         writer.close()
@@ -150,9 +147,6 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 extension.bundleExtras.each { k, v->
                     key("$k")
                     doValue(xml, v)
-                }
-                if (extension.extras != null) {
-                    xml.getPrinter().with { p -> p.println(extension.extras) }
                 }
             }
         }
