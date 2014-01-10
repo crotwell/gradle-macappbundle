@@ -48,19 +48,6 @@ class MacAppBundlePluginExtension implements Serializable {
      */
     String setFileCmd = "/usr/bin/SetFile"
     
-    /** The output directory for building the app. WARNING: Replaced by new appOutputDir. */
-    String outputDir = null
-    
-    @Deprecated
-    def setOutputDir(String val) {
-        System.err.println("outputDir is deprecated, please use appOutputDir or dmgOutputDir")
-        appOutputDir = val;
-    }
-    @Deprecated
-    def getOutputDir() {
-        throw new InvalidUserDataException("outputDir is deprecated, please use appOutputDir");
-    }
-    
     /** The output directory for building the app, relative to the build directory. */
     String appOutputDir = "macApp"
     
@@ -108,21 +95,6 @@ class MacAppBundlePluginExtension implements Serializable {
     
     String jarSubdir = 'Resources/Java'
     
-    /** Should the app use the Mac default of a single screen menubar (true) or a menubar per window (false). 
-     * Default is true. Deprecated, use javaProperties.put("apple.laf.useScreenMenuBar", "true")
-     */
-    boolean useScreenMenuBar = true
-    
-    @Deprecated
-    def setUseScreenMenuBar(String val) {
-        System.err.println("useScreenMenuBar is deprecated, please use javaProperties.[\"apple.laf.useScreenMenuBar\"]")
-        javaProperties["apple.laf.useScreenMenuBar"] = val;
-    }
-    @Deprecated
-    def getUseScreenMenuBar() {
-        throw new InvalidUserDataException("useScreenMenuBar is deprecated, please use javaProperties.[\"apple.laf.useScreenMenuBar\"]");
-    }
-    
     /** The name of the executable run by the bundle.
      * Default is 'JavaApplicationStub'.
      */
@@ -131,7 +103,7 @@ class MacAppBundlePluginExtension implements Serializable {
     /** BundleAllowMixedLocalizations, default is true */
     boolean bundleAllowMixedLocalizations = true
     
-    /** undlePackageType, default is 'APPL' */
+    /** BundlePackageType, default is 'APPL' */
     String bundlePackageType = 'APPL'
     
     /** BundleInfoDictionaryVersion, default is '6.0' */
@@ -141,24 +113,6 @@ class MacAppBundlePluginExtension implements Serializable {
      * Default is 'English'.
      */
     String bundleDevelopmentRegion = 'English'
-    
-    /** WARNING: Deprecated, use bundleProperties instead. Any extra xml that should be included in the info.plist file. Will be added
-     *  to the bottom inside the outermost <dict> element.
-     */
-    String extras = ""
-    
-    @Deprecated
-    def setExtras(String val) {
-        System.err.println("extras is deprecated, please use the bundleExtras map instead.")
-        extras = val
-    }
-    @Deprecated
-    def getExtras() {
-        if (extras != null) {
-            System.err.println("extras is deprecated, please use the bundleExtras map instead.")
-        }
-        return extras
-    }
     
     /** for codesign */
     String certIdentity = null
