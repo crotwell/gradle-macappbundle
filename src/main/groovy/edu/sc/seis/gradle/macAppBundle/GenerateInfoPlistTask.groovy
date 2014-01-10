@@ -15,6 +15,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
 
     static final String XML_DEF_LINE = '<?xml version="1.0" encoding="UTF-8"?>';
     static final String DOCTYPE_LINE = '<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">'
+    static final String URL_DOCTYPE_LINE = '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'
 
 
     @OutputFile
@@ -24,6 +25,77 @@ class GenerateInfoPlistTask  extends DefaultTask {
 
     @TaskAction
     def void writeInfoPlist() {
+        if (project.macAppBundle.appStyle == 'Oracle') {
+            writeInfoPlistOracleJava();
+        } else {
+            writeInfoPlistAppleJava();
+        }
+    }
+    
+    def void writeInfoPlistOracleJava() {
+        MacAppBundlePluginExtension extension = project.macAppBundle
+        def classpath = project.configurations.runtime.collect { "${it.name}" }
+        classpath.add(project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files.getSingleFile().name)
+        def file = getPlistFile()
+        file.parentFile.mkdirs()
+        def writer = new BufferedWriter(new FileWriter(file))
+        writer.write(XML_DEF_LINE);writer.newLine();
+        writer.write(URL_DOCTYPE_LINE);writer.newLine();
+        def xml = new MarkupBuilder(writer)
+        xml.plist(version:"1.0") {
+            dict() {
+                key('CFBundleDevelopmentRegion')
+                string(extension.bundleDevelopmentRegion)
+                key('CFBundleExecutable')
+                string(extension.bundleExecutable)
+                key('CFBundleIconFile')
+                string(project.file(extension.icon).name)
+                key('CFBundleIdentifier')
+                string(extension.mainClassName)
+                
+                key('CFBundleInfoDictionaryVersion')
+                string(extension.bundleInfoDictionaryVersion)
+                key('CFBundleName')
+                string(extension.appName)
+                key('CFBundlePackageType')
+                string(extension.bundlePackageType)
+                
+                key('CFBundleVersion')
+                string(project.version)
+                key('CFBundleAllowMixedLocalizations')
+                if (extension.bundleAllowMixedLocalizations) { string('true') } else { string('false') }
+                key('CFBundleSignature')
+                string(extension.creatorCode)
+                key('JVMMainClassName')
+                string(extension.mainClassName)
+                key('JVMOptions')
+                array() {
+                    extension.javaProperties.each { k, v->
+                            string("-D$k=$v")
+                    }
+                    extension.javaExtras.each { k, v->
+                            string("$k=$v")
+                    }
+                }
+                key('JVMArguments')
+                array() {
+                    extension.arguments.each { v->
+                            string("$v")
+                    }
+                }
+                extension.bundleExtras.each { k, v->
+                    key("$k")
+                    doValue(xml, v)
+                }
+                if (extension.extras != null) {
+                    xml.getPrinter().with { p -> p.println(extension.extras) }
+                }
+            }
+        }
+        writer.close()
+    }
+    
+    def void writeInfoPlistAppleJava() {
         MacAppBundlePluginExtension extension = project.macAppBundle
         def classpath = project.configurations.runtime.collect { "${it.name}" }
         classpath.add(project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files.getSingleFile().name)

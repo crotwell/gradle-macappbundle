@@ -93,7 +93,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.description = "Copies the project dependency jars in the Contents/Resorces/Java directory."
         task.group = GROUP
         task.with configureDistSpec(project)
-        task.into { project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/Resources/Java") }
+        task.into { project.file("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/${->project.macAppBundle.jarSubdir}") }
         return task
     }
 
@@ -101,9 +101,9 @@ class MacAppBundlePlugin implements Plugin<Project> {
         Task task = project.tasks.create(TASK_COPY_STUB_NAME, CopyJavaStubTask)
         task.description = "Copies the JavaApplicationStub into the Contents/MacOS directory."
         task.group = GROUP
-        task.doLast { ant.chmod(dir: project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/MacOS"), perm: "755", includes: "*") }
+        task.doLast { ant.chmod(dir: project.file("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/MacOS"), perm: "755", includes: "*") }
         task.inputs.property("bundle executable name", {project.macAppBundle.bundleExecutable})
-        task.outputs.file("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/MacOS/${project.macAppBundle.bundleExecutable}")
+        task.outputs.file("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/MacOS/${->project.macAppBundle.bundleExecutable}")
         return task
     }
 
@@ -171,9 +171,9 @@ class MacAppBundlePlugin implements Plugin<Project> {
             if (dmgFile.exists()) dmgFile.delete()
         }
         task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
-        task.outputs.file("${->project.buildDir}/${project.macAppBundle.dmgOutputDir}/${->project.macAppBundle.dmgName}.dmg")
+        task.outputs.file("${->project.buildDir}/${->project.macAppBundle.dmgOutputDir}/${->project.macAppBundle.dmgName}.dmg")
         task.doFirst { task.outputs.files.each { it.delete() } }
-        task.doFirst { project.file("${->project.buildDir}/${project.macAppBundle.dmgOutputDir}").mkdirs()}
+        task.doFirst { project.file("${->project.buildDir}/${->project.macAppBundle.dmgOutputDir}").mkdirs()}
         return task
     }
 
