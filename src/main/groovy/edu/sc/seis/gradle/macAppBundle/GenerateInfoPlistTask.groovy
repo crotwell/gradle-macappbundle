@@ -66,6 +66,11 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 if (extension.bundleAllowMixedLocalizations) { string('true') } else { string('false') }
                 key('CFBundleSignature')
                 string(extension.creatorCode)
+                if (extension.bundleJRE) {
+                    def jreVersion = new File(extension.jreHome).getParentFile().getParentFile().getName()
+                    key('JVMRuntime')
+                    string(jreVersion)
+                }
                 key('JVMMainClassName')
                 string(extension.mainClassName)
                 key('JVMOptions')
