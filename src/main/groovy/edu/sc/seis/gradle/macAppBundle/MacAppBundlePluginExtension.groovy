@@ -20,6 +20,26 @@ class MacAppBundlePluginExtension implements Serializable {
         if (jvmVersion == null) jvmVersion = project.targetCompatibility.toString()+"+"
         if (dmgOutputDir == null) dmgOutputDir = "${->project.distsDirName}"
         setAppStyle(appStyle)
+        if (appStyle == 'Oracle' && bundleJRE) {
+            if(jreHome == null) {
+                File jhFile = new File("/usr/libexec/java_home");
+                if ( ! jhFile.exists()) {
+                    throw new RuntimeException("bundleJRE not set and unable to find "+command+", is oracle java installed?");
+                }
+                def command = """/usr/libexec/java_home"""// Create the String
+                def proc = command.execute()                 // Call *execute* on the string
+                proc.waitFor()                               // Wait for the command to finish
+
+                // Obtain status and output
+                def retCode = proc.exitValue();
+                if (retCode == 0) { 
+                    // *out* from the external program is *in* for groovy
+                    jreHome = proc.in.text.trim();
+                } else {
+                    throw new RuntimeException("bundleJRE not set and return code of "+command+" is nonzero: "+retCode);
+                } 
+            }
+         }
     }
     
     /** The style of .app created. Use 'Apple' for the original Apple Java in OSX 10.8 and earlier. Starting in
@@ -80,7 +100,7 @@ class MacAppBundlePluginExtension implements Serializable {
     
     /** Map of properties to be put in the Properties dict inside the Java dict. Usage should be like
         javaProperties.put("apple.laf.useScreenMenuBar", "true") */
-    Map javaProperties = ["apple.laf.useScreenMenuBar" : "true"]
+    Map javaProperties = [:]
     
     /** Map of extra java key-value pairs to be put in the java level dict inside Info.plist. Usage should be like
         javaExtras.put("mykey", "myvalue") */
@@ -114,6 +134,21 @@ class MacAppBundlePluginExtension implements Serializable {
      */
     String bundleDevelopmentRegion = 'English'
     
+    boolean bundleJRE = false;
+    
+    /** Directory from which to copy the JRE. Generally this will be the same as
+    $JAVA_HOME or the result of /usr/libexec/java_home. Note that to be compatible
+    with the appbundler utility from Oracle, this is usually the Contents/Home
+    subdirectory of the JDK install.
+    
+    If bundleJRE is true, but jreHome is null, it will be set to the output of
+    /usr/libexec/java_home, which should be correct in most cases.
+    
+    For example:
+    /Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home
+    */
+    String jreHome
+    
     /** for codesign */
     String certIdentity = null
     
@@ -122,6 +157,10 @@ class MacAppBundlePluginExtension implements Serializable {
     
     /** for codesign */
     String keyChain = null
+    
+    public String getJREDirName() {
+        return new File(jreHome).getParentFile().getParentFile().getName()
+    }
     
     public File getPlistFileForProject(Project project) {
         return project.file("${project.buildDir}/${appOutputDir}/${appName}.app/Contents/Info.plist")
@@ -157,6 +196,8 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((bundleDevelopmentRegion == null) ? 0 : bundleDevelopmentRegion.hashCode());
         result = prime * result + ((extras == null) ? 0 : extras.hashCode());
         result = prime * result + ((arguments == null) ? 0 : arguments.hashCode());
+        result = prime * result + (bundleJRE ? 1231 : 1237);
+        result = prime * result + ((jreHome == null) ? 0 : jreHome.hashCode());
         result = prime * result + ((certIdentity == null) ? 0 : certIdentity.hashCode());
         result = prime * result + ((codeSignCmd == null) ? 0 : codeSignCmd.hashCode());
         result = prime * result + ((keyChain == null) ? 0 : keyChain.hashCode());
@@ -248,6 +289,13 @@ class MacAppBundlePluginExtension implements Serializable {
             if (other.bundleDevelopmentRegion != null)
                 return false;
         } else if (!bundleDevelopmentRegion.equals(other.bundleDevelopmentRegion))
+            return false;
+        if (bundleJRE != other.bundleJRE)
+            return false;
+        if (jreHome == null) {
+            if (other.jreHome != null)
+                return false;
+        } else if (!jreHome.equals(other.jreHome))
             return false;
         if (certIdentity == null) {
             if (other.certIdentity != null)

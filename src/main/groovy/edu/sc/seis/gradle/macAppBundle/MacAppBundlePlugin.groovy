@@ -26,6 +26,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     static final String TASK_COPY_STUB_NAME = "copyStub"
     static final String TASK_COPY_ICON_NAME = "copyIcon"
     static final String TASK_SET_FILE_NAME = "runSetFile"
+    static final String TASK_BUNDLE_JRE_NAME = "bundleJRE"
     static final String TASK_CREATE_APP_NAME = "createApp"
     static final String TASK_CODE_SIGN_NAME = "codeSign"
     static final String TASK_CREATE_DMG = "createDmg"
@@ -48,18 +49,21 @@ class MacAppBundlePlugin implements Plugin<Project> {
         copyIconTask.dependsOn(configTask)
         Task pkgInfoTask = createPkgInfoTask(project)
         pkgInfoTask.dependsOn(configTask)
+        Task bundleJRETask = createBundleJRETask(project)
+        bundleJRETask.dependsOn(configTask)
         Task createAppTask = addCreateAppTask(project)
         createAppTask.dependsOn(plistTask)
         createAppTask.dependsOn(copyTask)
         createAppTask.dependsOn(stubTask)
         createAppTask.dependsOn(copyIconTask)
         createAppTask.dependsOn(pkgInfoTask)
+        createAppTask.dependsOn(bundleJRETask)
         Task setFileTask = addSetFileTask(project)
         setFileTask.dependsOn(createAppTask)
         /* I think setfile is not required for a .app to be run on osx.
          * Leaving the task in, but not depended on by anything else. If
          * SetFile is needed, then switch the above depends to
-         setFileTask.dependsOn(createAppTask)
+         createAppTask.dependsOn(setFileTask)
          */
         setFileTask.mustRunAfter(createAppTask)
         Task codeSignTask = addCodeSignTask(project)
@@ -125,6 +129,29 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.group = GROUP
         task.inputs.property("creator code", { project.macAppBundle.creatorCode } )
         task.outputs.file(project.macAppBundle.getPkgInfoFileForProject(project))
+        return task
+    }
+
+    private Task createBundleJRETask(Project project) {
+        Task task = project.tasks.create(TASK_BUNDLE_JRE_NAME, Sync)
+        task.description = "Copies the JRE into the Contents/PlugIns directory."
+        task.group = GROUP
+        task.from("${->project.macAppBundle.jreHome}/../..") {
+            include('Contents/Home/jre/**')
+            include('Contents/Info.plist')
+            exclude('Contents/Home/jre/bin')
+            exclude('Contents/Home/"bin/')
+            exclude('Contents/Home/jre/bin/')
+            exclude('Contents/Home/jre/lib/deploy/')
+            exclude('Contents/Home/jre/lib/deploy.jar')
+            exclude('Contents/Home/jre/lib/javaws.jar')
+            exclude('Contents/Home/jre/lib/libdeploy.dylib')
+            exclude('Contents/Home/jre/lib/libnpjp2.dylib')
+            exclude('Contents/Home/jre/lib/plugin.jar')
+            exclude('Contents/Home/jre/lib/security/javaws.policy')
+        }
+        task.into "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/PlugIns/${->project.macAppBundle.getJREDirName()}"
+        task.onlyIf { project.macAppBundle.bundleJRE }
         return task
     }
 
