@@ -37,20 +37,18 @@ class MacAppBundlePlugin implements Plugin<Project> {
         project.plugins.apply(JavaPlugin)
         MacAppBundlePluginExtension pluginExtension = new MacAppBundlePluginExtension()
         project.extensions.macAppBundle = pluginExtension
+        project.afterEvaluate {
+            // this needs to happen after the extension has been populated, but
+            // before any tasks run
+            pluginExtension.configureDefaults(project)
+        }
 
-        Task configTask = addConfigurationTask(project)
         Task plistTask = addCreateInfoPlistTask(project)
-        plistTask.dependsOn(configTask)
         Task copyTask = addCopyToLibTask(project)
-        copyTask.dependsOn(configTask)
         Task stubTask = addCopyStubTask(project)
-        stubTask.dependsOn(configTask)
         Task copyIconTask = addCopyIconTask(project)
-        copyIconTask.dependsOn(configTask)
         Task pkgInfoTask = createPkgInfoTask(project)
-        pkgInfoTask.dependsOn(configTask)
         Task bundleJRETask = createBundleJRETask(project)
-        bundleJRETask.dependsOn(configTask)
         Task createAppTask = addCreateAppTask(project)
         createAppTask.dependsOn(plistTask)
         createAppTask.dependsOn(copyTask)
@@ -72,17 +70,11 @@ class MacAppBundlePlugin implements Plugin<Project> {
         dmgTask.dependsOn(createAppTask)
         dmgTask.mustRunAfter codeSignTask
         dmgTask.mustRunAfter setFileTask
+        Task zipTask = createAppZipTask(project)
+        zipTask.dependsOn(createAppTask)
+        zipTask.mustRunAfter codeSignTask
+        zipTask.mustRunAfter setFileTask
         project.getTasksByName("assemble", true).each{ t -> t.dependsOn(dmgTask) }
-    }
-
-    private Task addConfigurationTask(Project project) {
-        Task task = project.tasks.create(TASK_CONFIGURE_NAME)
-        task.description = "Sets default configuration values for the extension."
-        task.group = GROUP
-        task.doFirst {
-            project.macAppBundle.configureDefaults(project)
-        }
-        return task
     }
 
     private Task addCreateInfoPlistTask(Project project) {
@@ -184,6 +176,26 @@ class MacAppBundlePlugin implements Plugin<Project> {
         }
         task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
         task.outputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
+        return task
+    }
+
+    private Task createAppZipTask(Project project) {
+        def task = project.tasks.create(TASK_CREATE_ZIP, Zip)
+        task.description = "Create a zip containing the .app"
+        task.group = GROUP
+        // delay configure of task until extension is populated
+        project.afterEvaluate {
+            task.destinationDir = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}")
+            task.from("${->project.buildDir}/${->project.macAppBundle.appOutputDir}") {
+                include "${->project.macAppBundle.appName}.app/**" 
+                exclude "${->project.macAppBundle.appName}.app/Contents/MacOS" 
+            }
+            task.from("${->project.buildDir}/${->project.macAppBundle.appOutputDir}") {
+                include "${->project.macAppBundle.appName}.app/Contents/MacOS/**"
+                fileMode 0777  // octal requires leading zero
+            }
+            task.archiveName = "${->project.macAppBundle.dmgName}.zip"
+        }
         return task
     }
 
