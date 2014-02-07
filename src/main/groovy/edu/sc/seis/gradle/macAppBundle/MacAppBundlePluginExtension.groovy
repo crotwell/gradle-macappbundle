@@ -59,6 +59,8 @@ class MacAppBundlePluginExtension implements Serializable {
         } else if (val == 'Apple') {
             bundleExecutable = 'JavaApplicationStub'
             jarSubdir = 'Resources/Java'
+        } else {
+            throw new InvalidUserDataException("I don't understand appStyle='${appStyle}', should be one of 'Apple' or 'Oracle'")
         }
     }
     
