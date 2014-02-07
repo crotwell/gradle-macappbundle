@@ -16,7 +16,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
     static final String XML_DEF_LINE = '<?xml version="1.0" encoding="UTF-8"?>';
     static final String DOCTYPE_LINE = '<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">'
     static final String URL_DOCTYPE_LINE = '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">'
-
+    static final String SHAMELESS_PROMO = '<!-- created with Gradle, http://gradle.org, and the MacAppBundle plugin, http://code.google.com/p/gradle-macappbundle -->'
 
     @OutputFile
     File getPlistFile() {
@@ -39,8 +39,9 @@ class GenerateInfoPlistTask  extends DefaultTask {
         def file = getPlistFile()
         file.parentFile.mkdirs()
         def writer = new BufferedWriter(new FileWriter(file))
-        writer.write(XML_DEF_LINE);writer.newLine();
-        writer.write(URL_DOCTYPE_LINE);writer.newLine();
+        writer.writeLine(XML_DEF_LINE);
+        writer.writeLine(URL_DOCTYPE_LINE);
+        writer.writeLine(SHAMELESS_PROMO);
         def xml = new MarkupBuilder(writer)
         xml.plist(version:"1.0") {
             dict() {
