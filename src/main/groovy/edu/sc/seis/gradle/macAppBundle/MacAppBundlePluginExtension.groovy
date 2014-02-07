@@ -161,15 +161,6 @@ class MacAppBundlePluginExtension implements Serializable {
     public String getJREDirName() {
         return new File(jreHome).getParentFile().getParentFile().getName()
     }
-    
-    public File getPlistFileForProject(Project project) {
-        return project.file("${project.buildDir}/${appOutputDir}/${appName}.app/Contents/Info.plist")
-    }
-    
-    public File getPkgInfoFileForProject(Project project) {
-        return project.file("${project.buildDir}/${appOutputDir}/${appName}.app/Contents/PkgInfo")
-    }
-    
 
     @Override
     public int hashCode() {

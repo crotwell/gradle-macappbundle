@@ -14,17 +14,16 @@ class PkgInfoTask  extends DefaultTask {
 
     @OutputFile
     File getPkgInfoFile() {
-        return project.macAppBundle.getPkgInfoFileForProject(project)
+        return project.file("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/PkgInfo")
     }
 
     @TaskAction
     def void writeInfoPlist() {
-        MacAppBundlePluginExtension extension = project.macAppBundle
         def file = getPkgInfoFile()
         file.parentFile.mkdirs()
         def writer = new BufferedWriter(new FileWriter(file))
         writer.write(APPL_LINE)
-        writer.write(extension.creatorCode);
+        writer.write(project.macAppBundle.creatorCode);
         writer.newLine();
         writer.close();
     }

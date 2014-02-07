@@ -1,16 +1,17 @@
 package edu.sc.seis.gradle.macAppBundle;
 
-import org.gradle.api.Project
-import org.gradle.api.Plugin
-import org.gradle.api.Task
+import org.gradle.api.Project;
+import org.gradle.api.Plugin;
+import org.gradle.api.Task;
 import org.gradle.api.InvalidUserDataException;
-import org.gradle.api.file.CopySpec
-import org.gradle.api.plugins.JavaPlugin
+import org.gradle.api.file.CopySpec;
+import org.gradle.api.plugins.JavaPlugin;
 import org.gradle.api.tasks.JavaExec;
 import org.gradle.api.tasks.Sync;
 import org.gradle.api.tasks.Copy;
 import org.gradle.api.tasks.Exec;
 import org.gradle.api.tasks.bundling.Zip;
+import groovy.text.SimpleTemplateEngine;
 
 
 class MacAppBundlePlugin implements Plugin<Project> {
@@ -29,6 +30,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
     static final String TASK_BUNDLE_JRE_NAME = "bundleJRE"
     static final String TASK_CREATE_APP_NAME = "createApp"
     static final String TASK_CODE_SIGN_NAME = "codeSign"
+    static final String TASK_COPY_BKGD_IMAGE_NAME = "copyBackgroundImage"
     static final String TASK_CREATE_DMG = "createDmg"
     static final String TASK_CREATE_ZIP = "createAppZip"
 
@@ -66,8 +68,12 @@ class MacAppBundlePlugin implements Plugin<Project> {
         setFileTask.mustRunAfter(createAppTask)
         Task codeSignTask = addCodeSignTask(project)
         codeSignTask.dependsOn(createAppTask)
-        Task dmgTask = addDmgTask(project)
+        Task copyBkgImage = createCopyBackgroundImageTask(project)
+        Task dmgTask = createDMGTask(project)
+        dmgTask.dependsOn(copyBkgImage)
+        //dmgTask.dependsOn(dmgTask)
         dmgTask.dependsOn(createAppTask)
+        dmgTask.dependsOn(copyBkgImage)
         dmgTask.mustRunAfter codeSignTask
         dmgTask.mustRunAfter setFileTask
         Task zipTask = createAppZipTask(project)
@@ -81,9 +87,8 @@ class MacAppBundlePlugin implements Plugin<Project> {
         Task task = project.tasks.create(TASK_INFO_PLIST_GENERATE_NAME, GenerateInfoPlistTask)
         task.description = "Creates the Info.plist configuration file inside the mac osx .app directory."
         task.group = GROUP
-        task.inputs.property("project version", project.version)
+        task.inputs.property("project version", {project.version})
         task.inputs.property("MacAppBundlePlugin extension", {project.macAppBundle})
-        task.outputs.file(project.file(project.macAppBundle.getPlistFileForProject(project)))
         return task
     }
 
@@ -117,10 +122,9 @@ class MacAppBundlePlugin implements Plugin<Project> {
 
     private Task createPkgInfoTask(Project project) {
         Task task = project.tasks.create(TASK_PKG_INFO_GENERATE_NAME, PkgInfoTask)
-        task.description = "Creates the Info.plist configuration file inside the mac osx .app directory."
+        task.description = "Creates the PkgInfo configuration file inside the mac osx .app directory."
         task.group = GROUP
         task.inputs.property("creator code", { project.macAppBundle.creatorCode } )
-        task.outputs.file(project.macAppBundle.getPkgInfoFileForProject(project))
         return task
     }
 
@@ -187,8 +191,8 @@ class MacAppBundlePlugin implements Plugin<Project> {
         project.afterEvaluate {
             task.destinationDir = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}")
             task.from("${->project.buildDir}/${->project.macAppBundle.appOutputDir}") {
-                include "${->project.macAppBundle.appName}.app/**" 
-                exclude "${->project.macAppBundle.appName}.app/Contents/MacOS" 
+                include "${->project.macAppBundle.appName}.app/**"
+                exclude "${->project.macAppBundle.appName}.app/Contents/MacOS"
             }
             task.from("${->project.buildDir}/${->project.macAppBundle.appOutputDir}") {
                 include "${->project.macAppBundle.appName}.app/Contents/MacOS/**"
@@ -199,23 +203,66 @@ class MacAppBundlePlugin implements Plugin<Project> {
         return task
     }
 
-    private Task addDmgTask(Project project) {
-        def task = project.tasks.create(TASK_CREATE_DMG, Exec)
-        task.description = "Create a dmg containing the .app"
+
+
+    private Task createCopyBackgroundImageTask(Project project) {
+        Task task = project.tasks.create(TASK_COPY_BKGD_IMAGE_NAME, Sync)
+        task.description = "Copies the dmg background image into the .app parent directory, as .background/imagename."
         task.group = GROUP
-        task.doFirst {
-            workingDir = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}")
-            commandLine "hdiutil", "create", "-srcfolder",
-                    project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}"),
-                    "-volname", "${->project.macAppBundle.volumeName}",
-                    "${->project.macAppBundle.dmgName}"
-            def dmgFile = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}/${->project.macAppBundle.dmgName}.dmg")
-            if (dmgFile.exists()) dmgFile.delete()
+
+        project.afterEvaluate {
+            task.onlyIf { project.macAppBundle.backgroundImage != null }
+            if (project.macAppBundle.backgroundImage != null) {
+                task.from "${->project.macAppBundle.backgroundImage}"
+                task.into "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/.background"
+            }
         }
+        return task
+    }
+
+    private Task createDMGTask(Project project) {
+        def task = project.tasks.create(TASK_CREATE_DMG, Exec)
+        task.description = "Create a dmg containing the .app and optional background image"
+        task.group = GROUP
         task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
+        task.inputs.property("backgroundImage", { project.macAppBundle.backgroundImage } )
         task.outputs.file("${->project.buildDir}/${->project.macAppBundle.dmgOutputDir}/${->project.macAppBundle.dmgName}.dmg")
-        task.doFirst { task.outputs.files.each { it.delete() } }
-        task.doFirst { project.file("${->project.buildDir}/${->project.macAppBundle.dmgOutputDir}").mkdirs()}
+
+        project.afterEvaluate {
+            def dmgOutDir = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}")
+            GString tmpDmgName;
+            String dmgFormat;
+            if (project.macAppBundle.backgroundImage != null) {
+                // if we have a background image, we need to create a RW disk image so we can set it,
+                // and then convert the RW to a compressed RO image later with the final name
+                tmpDmgName = "tmp_${->project.macAppBundle.dmgName}.dmg"
+                dmgFormat = "UDRW"
+            } else {
+                // in this case, we create the disk image in one go without the conversion step
+                tmpDmgName = "${->project.macAppBundle.dmgName}.dmg"
+                dmgFormat = "UDZO";
+            }
+            task.doFirst {
+                def dmgFile = new File(dmgOutDir, tmpDmgName)
+                if (dmgFile.exists()) {
+                    dmgFile.delete()
+                }
+                workingDir = dmgOutDir
+                commandLine "hdiutil", "create", "-srcfolder",
+                        project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}"),
+                        "-format", "${->dmgFormat}", "-fs", "HFS+",
+                        "-volname", "${->project.macAppBundle.volumeName}",
+                        tmpDmgName
+            }
+            task.doLast {
+                if (project.macAppBundle.backgroundImage != null) {
+                    String backgroundImage = new File(project.macAppBundle.backgroundImage).getName() // just name, not paths
+                    doBackgroundImageAppleScript(dmgOutDir, tmpDmgName, "${->project.macAppBundle.dmgName}.dmg", "${->project.macAppBundle.volumeName}", backgroundImage, "${->project.macAppBundle.appName}")
+                }
+            }
+            task.doFirst { task.outputs.files.each { it.delete() } }
+            task.doFirst { dmgOutDir.mkdirs() }
+        }
         return task
     }
 
@@ -237,6 +284,85 @@ class MacAppBundlePlugin implements Plugin<Project> {
 
         return distSpec
     }
+
+
+    /** see 
+     http://asmaloney.com/2013/07/howto/packaging-a-mac-os-x-application-using-a-dmg/
+     */
+    private void doBackgroundImageAppleScript(File dmgOutDir,
+                                              String tmpDmgFile,
+                                              String finalDmgFile,
+                                              String volMountPoint,
+                                              String backgroundImage,
+                                              String appName) {
+        if (new File("/Volumes/${volMountPoint}").exists()) {
+            runCmd("hdiutil detach /Volumes/${volMountPoint}", "Unable to detach volume: ${volMountPoint}")
+        }
+        // mount temp dmg
+        def mountCmdText = "hdiutil attach -readwrite -noverify ${dmgOutDir}/${tmpDmgFile}"
+
+        String mountCmdOut = runCmd(mountCmdText, "Unable to mount dmg")
+        if ( ! new File("/Volumes/${volMountPoint}").exists()) {
+            throw new RuntimeException("Unable to find volume mount point to set background image. ${volMMountPoint}")
+        }
+
+        runCmd("ln -s /Applications /Volumes/${volMountPoint}", "Unable to link /Applications in dmg");
+
+        def binding = ["APP_NAME":appName, "VOL_NAME":volMountPoint, "DMG_BACKGROUND_IMG":backgroundImage ]
+        def engine = new SimpleTemplateEngine()
+        def template = engine.createTemplate(backgroundScript).make(binding)
+
+        sleep 2000
+        def appleScriptCmd = "osascript".execute()
+        appleScriptCmd.withWriter { writer ->
+            writer << template.toString()
+        }
+        appleScriptCmd.waitFor();
+        def retCode = appleScriptCmd.exitValue();
+        if (retCode != 0) {
+            throw new RuntimeException("Problem running applescript to set dmg background image: "+retCode+" "+appleScriptCmd.err.text);
+        }
+        runCmd("hdiutil detach /Volumes/${volMountPoint}", "Unable to detach volume: ${volMountPoint}")
+        runCmd("hdiutil convert ${dmgOutDir}/${tmpDmgFile} -format UDZO -imagekey zlib-level=9 -o ${dmgOutDir}/${finalDmgFile}", "Unable to conver dmg image")
+        new File("${dmgOutDir}/${tmpDmgFile}").delete()
+    }
+
+    private String runCmd(GString cmdText, String errMsg) {
+        return runCmd(cmdText, GString.EMPTY + errMsg);
+    }
+
+    private String runCmd(GString cmdText, GString errMsg) {
+        def cmd = cmdText.execute()
+        cmd.waitFor();
+        def retCode = cmd.exitValue();
+        if (retCode != 0) {
+            throw new RuntimeException("${errMsg}, return code from '${cmdText}' is nonzero: ${retCode}  ${cmd.err.text}");
+        }
+        return cmd.in.text
+    }
+
+    String backgroundScript = """
+   tell application "Finder"
+     tell disk "\${VOL_NAME}"
+           open
+           set current view of container window to icon view
+           set toolbar visible of container window to false
+           set statusbar visible of container window to false
+           set the bounds of container window to {400, 100, 920, 440}
+           set viewOptions to the icon view options of container window
+           set arrangement of viewOptions to not arranged
+           set icon size of viewOptions to 72
+           set background picture of viewOptions to file ".background:\${DMG_BACKGROUND_IMG}"
+           set position of item "\${APP_NAME}.app" of container window to {160, 205}
+           set position of item "Applications" of container window to {360, 205}
+           close
+           open
+           update without registering applications
+           delay 2
+        end tell
+     end tell
+"""
+
 }
 
 

@@ -20,7 +20,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
 
     @OutputFile
     File getPlistFile() {
-        return project.macAppBundle.getPlistFileForProject(project)
+        return project.file("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/Info.plist")
     }
 
     @TaskAction
