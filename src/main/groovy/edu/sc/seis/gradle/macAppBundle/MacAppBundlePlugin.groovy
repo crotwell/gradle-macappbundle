@@ -296,6 +296,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
                                               String backgroundImage,
                                               String appName) {
         if (new File("/Volumes/${volMountPoint}").exists()) {
+            // if volume already mounted, maybe due to previous build, unmount
             runCmd("hdiutil detach /Volumes/${volMountPoint}", "Unable to detach volume: ${volMountPoint}")
         }
         // mount temp dmg
