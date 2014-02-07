@@ -39,7 +39,7 @@ publishing {
                 asNode().children().last() + {
                     resolveStrategy = Closure.DELEGATE_FIRST
                     name "${project.name}"
-                    description 'description for project'
+                    description 'A Gradle Plugin to create a Mac OSX .app application based on the project.'
                     url "http://code.google.com/p/gradle-macappbundle/"
                     scm {
                         url 'http://code.google.com/p/gradle-macappbundle/source/browse/'
