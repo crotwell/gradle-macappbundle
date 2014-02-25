@@ -328,7 +328,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
             throw new RuntimeException("Problem running applescript to set dmg background image: "+retCode+" "+appleScriptCmd.err.text);
         }
         runCmd("hdiutil detach /Volumes/${volMountPoint}", "Unable to detach volume: ${volMountPoint}")
-        runCmd("hdiutil convert ${dmgOutDir}/${tmpDmgFile} -format UDZO -imagekey zlib-level=9 -o ${dmgOutDir}/${finalDmgFile}", "Unable to conver dmg image")
+        runCmd("hdiutil convert ${dmgOutDir}/${tmpDmgFile} -format UDZO -imagekey zlib-level=9 -o ${dmgOutDir}/${finalDmgFile}", "Unable to convert dmg image")
         new File("${dmgOutDir}/${tmpDmgFile}").delete()
     }
 
