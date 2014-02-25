@@ -187,7 +187,6 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((bundlePackageType == null) ? 0 : bundlePackageType.hashCode());
         result = prime * result + ((bundleInfoDictionaryVersion == null) ? 0 : bundleInfoDictionaryVersion.hashCode());
         result = prime * result + ((bundleDevelopmentRegion == null) ? 0 : bundleDevelopmentRegion.hashCode());
-        result = prime * result + ((extras == null) ? 0 : extras.hashCode());
         result = prime * result + ((arguments == null) ? 0 : arguments.hashCode());
         result = prime * result + (bundleJRE ? 1231 : 1237);
         result = prime * result + ((jreHome == null) ? 0 : jreHome.hashCode());
@@ -325,11 +324,6 @@ class MacAppBundlePluginExtension implements Serializable {
             if (other.arguments != null)
                 return false;
         } else if (!arguments.equals(other.arguments))
-            return false;
-        if (extras == null) {
-            if (other.extras != null)
-                return false;
-        } else if (!extras.equals(other.extras))
             return false;
         return true;
     }
