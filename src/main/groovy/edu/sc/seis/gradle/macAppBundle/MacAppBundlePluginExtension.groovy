@@ -161,6 +161,28 @@ class MacAppBundlePluginExtension implements Serializable {
     /** for codesign */
     String keyChain = null
     
+    /** for setting the background image of the dmg. */
+    String backgroundScript = """
+   tell application "Finder"
+     tell disk "\${VOL_NAME}"
+           open
+           set current view of container window to icon view
+           set toolbar visible of container window to false
+           set statusbar visible of container window to false
+           set the bounds of container window to {400, 100, 920, 440}
+           set viewOptions to the icon view options of container window
+           set arrangement of viewOptions to not arranged
+           set icon size of viewOptions to 72
+           set background picture of viewOptions to file ".background:\${DMG_BACKGROUND_IMG}"
+           set position of item "\${APP_NAME}.app" of container window to {160, 205}
+           set position of item "Applications" of container window to {360, 205}
+           close
+           open
+           update without registering applications
+           delay 2
+        end tell
+     end tell
+"""
     public String getJREDirName() {
         return new File(jreHome).getParentFile().getParentFile().getName()
     }
@@ -194,6 +216,8 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((certIdentity == null) ? 0 : certIdentity.hashCode());
         result = prime * result + ((codeSignCmd == null) ? 0 : codeSignCmd.hashCode());
         result = prime * result + ((keyChain == null) ? 0 : keyChain.hashCode());
+        result = prime * result + ((backgroundScript == null) ? 0 : backgroundScript.hashCode());
+        
         return result;
     }
 
@@ -326,6 +350,12 @@ class MacAppBundlePluginExtension implements Serializable {
                 return false;
         } else if (!arguments.equals(other.arguments))
             return false;
+        if (backgroundScript == null) {
+            if (other.backgroundScript != null)
+                return false;
+        } else if (!backgroundScript.equals(other.backgroundScript))
+            return false;
+            
         return true;
     }
     
