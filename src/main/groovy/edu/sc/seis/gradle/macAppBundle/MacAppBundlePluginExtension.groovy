@@ -44,12 +44,13 @@ class MacAppBundlePluginExtension implements Serializable {
     
     /** The style of .app created. Use 'Apple' for the original Apple Java in OSX 10.8 and earlier. Starting in
     OSX 10.9 there can be either Apple Java (1.6) or Oracle Java (1.7) and the internals of the Info.plist and
-    the executable stub are different. The default is 'Apple'. Setting this to 'Oracle' will also change the 
-    bundleExecutable to be the Oracle JavaAppLauncher instead of and the jarSubdir to be Java.
+    the executable stub are different. Setting this will also change the 
+    bundleExecutable and the jarSubdir as both of these are different in Oracle versus Apple styles.
+    The default is 'Oracle'.
     
     More information on the new Oracle style .app can be found <a href="https://java.net/projects/appbundler">here</a>.
     */
-    String appStyle = 'Apple'
+    String appStyle = 'Oracle'
     
     def setAppStyle(String val) {
         appStyle = val
@@ -115,12 +116,12 @@ class MacAppBundlePluginExtension implements Serializable {
     /** List of arguments to pass to the application. Only used for Oracle-style apps. */
     List arguments = []
     
-    String jarSubdir = 'Resources/Java'
+    String jarSubdir = 'Java'
     
     /** The name of the executable run by the bundle.
      * Default is 'JavaApplicationStub'.
      */
-    String bundleExecutable = 'JavaApplicationStub'
+    String bundleExecutable = 'JavaAppLauncher'
     
     /** BundleAllowMixedLocalizations, default is true */
     boolean bundleAllowMixedLocalizations = true
