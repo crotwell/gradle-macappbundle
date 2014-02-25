@@ -224,7 +224,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         def task = project.tasks.create(TASK_CREATE_DMG, Exec)
         task.description = "Create a dmg containing the .app and optional background image"
         task.group = GROUP
-        task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
+        task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}")
         task.inputs.property("backgroundImage", { project.macAppBundle.backgroundImage } )
         task.outputs.file("${->project.buildDir}/${->project.macAppBundle.dmgOutputDir}/${->project.macAppBundle.dmgName}.dmg")
 
@@ -246,6 +246,10 @@ class MacAppBundlePlugin implements Plugin<Project> {
                 def dmgFile = new File(dmgOutDir, tmpDmgName)
                 if (dmgFile.exists()) {
                     dmgFile.delete()
+                }
+                def finalDmgFile = new File(dmgOutDir, "${->project.macAppBundle.dmgName}.dmg")
+                if (finalDmgFile.exists()) {
+                    finalDmgFile.delete()
                 }
                 workingDir = dmgOutDir
                 commandLine "hdiutil", "create", "-srcfolder",
