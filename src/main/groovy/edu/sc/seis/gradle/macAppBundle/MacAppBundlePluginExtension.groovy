@@ -92,20 +92,24 @@ class MacAppBundlePluginExtension implements Serializable {
     /** The background image for the DMG. */
     String backgroundImage
     
-    /** The name of the application, without the .app extension */
+    /** The name of the application, without the .app extension. 
+     * Defaults to project.name */
     String appName
     
-    /** The name of the volume */
+    /** The name of the volume. Defaults to project.name-project.version */
     String volumeName
     
-    /** The base name of the dmg file, without the .dmg extension. */
+    /** The base name of the dmg file, without the .dmg extension. 
+     * Defaults to project.name-project.version*/
     String dmgName
     
-    /** Map of properties to be put in the Properties dict inside the Java dict. Usage should be like
+    /** Map of properties to be put as -D options for Oracle Java an 
+     * in the Properties dict inside the Java dict for Apple. Usage should be like
         javaProperties.put("apple.laf.useScreenMenuBar", "true") */
     Map javaProperties = [:]
     
-    /** Map of extra java key-value pairs to be put in the java level dict inside Info.plist. Usage should be like
+    /** Map of extra java key-value pairs to be put in JVMOptions for Oracle and 
+     * put in the java level dict inside Info.plist for Apple. Usage should be like
         javaExtras.put("mykey", "myvalue") */
     Map javaExtras = [:]
     
@@ -116,10 +120,13 @@ class MacAppBundlePluginExtension implements Serializable {
     /** List of arguments to pass to the application. Only used for Oracle-style apps. */
     List arguments = []
     
+    /* subdir of the Contents dir to put the jar files. Defaults to Java for Oracle and
+     * to Resources/Java for Apple.
+     */
     String jarSubdir = 'Java'
     
     /** The name of the executable run by the bundle.
-     * Default is 'JavaApplicationStub'.
+     * Default is 'JavaAppLauncher'. This is also set when setting the style to Oracle or Apple.
      */
     String bundleExecutable = 'JavaAppLauncher'
     
@@ -137,6 +144,9 @@ class MacAppBundlePluginExtension implements Serializable {
      */
     String bundleDevelopmentRegion = 'English'
     
+    /** Whether or not to bundle the JRE in the .app. Only used if the app style is Oracle.
+     * Defaults to false.
+     */
     boolean bundleJRE = false;
     
     /** Directory from which to copy the JRE. Generally this will be the same as
@@ -161,7 +171,10 @@ class MacAppBundlePluginExtension implements Serializable {
     /** for codesign */
     String keyChain = null
     
-    /** for setting the background image of the dmg. */
+    /** An AppleScript script for setting the background image of the dmg.
+     * see 
+     * http://asmaloney.com/2013/07/howto/packaging-a-mac-os-x-application-using-a-dmg/
+     */
     String backgroundScript = """
    tell application "Finder"
      tell disk "\${VOL_NAME}"
@@ -183,6 +196,7 @@ class MacAppBundlePluginExtension implements Serializable {
         end tell
      end tell
 """
+    
     public String getJREDirName() {
         return new File(jreHome).getParentFile().getParentFile().getName()
     }
