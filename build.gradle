@@ -1,6 +1,7 @@
 
 
 plugins {
+  id 'eclipse'
   id 'nu.studer.plugindev' version '1.0.3'
   id 'groovy'
 }
