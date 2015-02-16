@@ -171,6 +171,9 @@ class MacAppBundlePluginExtension implements Serializable {
     /** for codesign */
     String keyChain = null
     
+    /** codesign use --deep */
+    boolean codeSignDeep = true;
+    
     /** An AppleScript script for setting the background image of the dmg.
      * see 
      * http://asmaloney.com/2013/07/howto/packaging-a-mac-os-x-application-using-a-dmg/
@@ -229,6 +232,7 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((jreHome == null) ? 0 : jreHome.hashCode());
         result = prime * result + ((certIdentity == null) ? 0 : certIdentity.hashCode());
         result = prime * result + ((codeSignCmd == null) ? 0 : codeSignCmd.hashCode());
+        result = prime * result + (codeSignDeep ? 1231 : 1237);
         result = prime * result + ((keyChain == null) ? 0 : keyChain.hashCode());
         result = prime * result + ((backgroundScript == null) ? 0 : backgroundScript.hashCode());
         
@@ -337,6 +341,8 @@ class MacAppBundlePluginExtension implements Serializable {
             if (other.codeSignCmd != null)
                 return false;
         } else if (!codeSignCmd.equals(other.codeSignCmd))
+            return false;
+        if (codeSignDeep != other.codeSignDeep)
             return false;
         if (keyChain == null) {
             if (other.keyChain != null)
