@@ -173,10 +173,16 @@ class MacAppBundlePlugin implements Plugin<Project> {
                 throw new InvalidUserDataException("No value has been specified for property certIdentity")
             }
             workingDir = project.file("${project.buildDir}/${project.macAppBundle.appOutputDir}")
-            commandLine "${->project.macAppBundle.codeSignCmd}", "-s", "${->project.macAppBundle.certIdentity}", "-f", "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app"
-            if (project.macAppBundle.keyChain) {
-                commandLine << "--keychain" << "${->project.macAppBundle.keyChain}"
+            //commandLine "${->project.macAppBundle.codeSignCmd}", "--deep" , "-s" , "${->project.macAppBundle.certIdentity}" , "-f" , "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app" 
+
+            def tmpCommandLine = [ "${->project.macAppBundle.codeSignCmd}", "-s" , "${->project.macAppBundle.certIdentity}" , "-f" , "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app" ];
+            if (project.macAppBundle.codeSignDeep) {
+                tmpCommandLine << "--deep"
             }
+            if (project.macAppBundle.keyChain) {
+                tmpCommandLine << "--keychain" << "${->project.macAppBundle.keyChain}"
+            }
+            commandLine tmpCommandLine
         }
         task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
         task.outputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app")
