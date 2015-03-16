@@ -222,6 +222,15 @@ class MacAppBundlePlugin implements Plugin<Project> {
                 task.from "${->project.macAppBundle.backgroundImage}"
                 task.into "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/.background"
             }
+            task.doLast {
+                String backgroundImage = new File(project.macAppBundle.backgroundImage).getName() // just name, not paths    
+                def imageWidth = runCmd("sips -g pixelWidth ${->project.buildDir}/${->project.macAppBundle.appOutputDir}/.background/${backgroundImage}", "Unable to determine image size with sips")
+                imageWidth = imageWidth.tokenize()[2];
+                def imageHeight = runCmd("sips -g pixelHeight ${->project.buildDir}/${->project.macAppBundle.appOutputDir}/.background/${backgroundImage}", "Unable to determine image size with sips")
+                imageHeight = imageHeight.tokenize()[2];
+                project.macAppBundle.backgroundImageWidth = imageWidth
+                project.macAppBundle.backgroundImageHeight = imageHeight
+            }
         }
         return task
     }
@@ -273,7 +282,13 @@ class MacAppBundlePlugin implements Plugin<Project> {
                                                    "${->project.macAppBundle.volumeName}",
                                                     backgroundImage,
                                                     "${->project.macAppBundle.appName}",
-                                                    "${->project.macAppBundle.backgroundScript}")
+                                                    "${->project.macAppBundle.backgroundScript}",
+                                                    "${->project.macAppBundle.backgroundImageWidth}",
+                                                    "${->project.macAppBundle.backgroundImageHeight}",
+                                                    "${->project.macAppBundle.appIconX}",
+                                                    "${->project.macAppBundle.appIconY}",
+                                                    "${->project.macAppBundle.appFolderX}",
+                                                    "${->project.macAppBundle.appFolderY}")
                 }
             }
             task.doFirst { task.outputs.files.each { it.delete() } }
@@ -311,7 +326,11 @@ class MacAppBundlePlugin implements Plugin<Project> {
                                               String volMountPoint,
                                               String backgroundImage,
                                               String appName,
-                                              String backgroundScript) {
+                                              String backgroundScript,
+                                              String imageWidth,
+                                              String imageHeight,
+                                              String appIconX, String appIconY,
+                                              String appFolderX, String appFolderY) {
         if (new File("/Volumes/${volMountPoint}").exists()) {
             // if volume already mounted, maybe due to previous build, unmount
             runCmd("hdiutil detach /Volumes/${volMountPoint}", "Unable to detach volume: ${volMountPoint}")
@@ -325,12 +344,16 @@ class MacAppBundlePlugin implements Plugin<Project> {
         }
 
         runCmd("ln -s /Applications /Volumes/${volMountPoint}", "Unable to link /Applications in dmg");
-
-        def binding = ["APP_NAME":appName, "VOL_NAME":volMountPoint, "DMG_BACKGROUND_IMG":backgroundImage ]
+        
+        def binding = ["APP_NAME":appName, "VOL_NAME":volMountPoint, "DMG_BACKGROUND_IMG":backgroundImage,
+            "IMAGE_WIDTH":imageWidth,
+            "IMAGE_HEIGHT":imageHeight,
+            "APPICONX":appIconX, "APPICONY":appIconY,
+            "APPFOLDERX":appFolderX, "APPFOLDERY":appFolderY ]
         def engine = new SimpleTemplateEngine()
         def template = engine.createTemplate(backgroundScript).make(binding)
 
-        sleep 2000
+//        sleep 2000
         def appleScriptCmd = "osascript".execute()
         appleScriptCmd.withWriter { writer ->
             writer << template.toString()
@@ -350,13 +373,16 @@ class MacAppBundlePlugin implements Plugin<Project> {
     }
 
     private String runCmd(GString cmdText, GString errMsg) {
+        def sout = new StringBuffer()
+        def serr = new StringBuffer()
         def cmd = cmdText.execute()
+        cmd.consumeProcessOutput(sout, serr)
         cmd.waitFor();
         def retCode = cmd.exitValue();
         if (retCode != 0) {
-            throw new RuntimeException("${errMsg}, return code from '${cmdText}' is nonzero: ${retCode}  ${cmd.err.text}");
+            throw new RuntimeException("${errMsg}, return code from '${cmdText}' is nonzero: ${retCode}  ${serr}");
         }
-        return cmd.in.text
+        return sout
     }
 
 }

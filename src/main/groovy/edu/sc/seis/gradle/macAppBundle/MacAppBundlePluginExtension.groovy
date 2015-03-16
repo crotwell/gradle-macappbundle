@@ -174,6 +174,13 @@ class MacAppBundlePluginExtension implements Serializable {
     /** codesign use --deep */
     boolean codeSignDeep = true;
     
+    String appIconX = "160", appIconY = "205";
+    String appFolderX = "360", appFolderY = "205";
+    
+    // will be set by using sips when copying image to .background folder
+    String backgroundImageWidth = "100";
+    String backgroundImageHeight = "100";
+    
     /** An AppleScript script for setting the background image of the dmg.
      * see 
      * http://asmaloney.com/2013/07/howto/packaging-a-mac-os-x-application-using-a-dmg/
@@ -185,13 +192,14 @@ class MacAppBundlePluginExtension implements Serializable {
            set current view of container window to icon view
            set toolbar visible of container window to false
            set statusbar visible of container window to false
-           set the bounds of container window to {400, 100, 920, 440}
+           set the bounds of container window to { 0, 0, \${IMAGE_WIDTH}, \${IMAGE_HEIGHT} }
+           set the position of the container window to {400, 100}
            set viewOptions to the icon view options of container window
            set arrangement of viewOptions to not arranged
            set icon size of viewOptions to 72
            set background picture of viewOptions to file ".background:\${DMG_BACKGROUND_IMG}"
-           set position of item "\${APP_NAME}.app" of container window to {160, 205}
-           set position of item "Applications" of container window to {360, 205}
+           set position of item "\${APP_NAME}.app" of container window to { \${APPICONX}, \${APPICONY} }
+           set position of item "Applications" of container window to { \${APPFOLDERX}, \${APPFOLDERY} }
            close
            open
            update without registering applications
