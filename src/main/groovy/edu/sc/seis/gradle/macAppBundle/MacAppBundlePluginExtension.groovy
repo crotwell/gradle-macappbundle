@@ -133,6 +133,9 @@ class MacAppBundlePluginExtension implements Serializable {
     /** BundleAllowMixedLocalizations, default is true */
     boolean bundleAllowMixedLocalizations = true
     
+    /** NSHighResolutionCapable for retina display, default is true */
+    boolean highResolutionCapable = true
+    
     /** BundlePackageType, default is 'APPL' */
     String bundlePackageType = 'APPL'
     
