@@ -7,7 +7,7 @@ plugins {
 }
 
 group "edu.sc.seis.gradle"
-version "2.1.1"
+version "2.1.1-SNAPSHOT"
 
 plugindev {
     pluginId = 'edu.sc.seis.macAppBundle'
