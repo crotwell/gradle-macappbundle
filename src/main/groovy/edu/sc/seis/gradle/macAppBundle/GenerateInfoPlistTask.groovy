@@ -81,10 +81,18 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 key('JVMOptions')
                 array() {
                     extension.javaProperties.each { k, v->
+                        if (v != null) {
                             string("-D$k=$v")
+                        } else {
+                            string("-D$k")
+                        }
                     }
                     extension.javaExtras.each { k, v->
+                        if (v != null) {
                             string("$k=$v")
+                        } else {
+                            string("$k")
+                        }
                     }
                 }
                 key('JVMArguments')
