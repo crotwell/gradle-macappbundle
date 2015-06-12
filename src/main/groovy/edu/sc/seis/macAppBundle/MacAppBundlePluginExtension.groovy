@@ -1,4 +1,4 @@
-package edu.sc.seis.gradle.macAppBundle
+package edu.sc.seis.macAppBundle
 
 import java.io.File;
 

@@ -1,4 +1,4 @@
-package edu.sc.seis.gradle.macAppBundle
+package edu.sc.seis.macAppBundle
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
