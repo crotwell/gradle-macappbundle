@@ -1,36 +1,52 @@
 
 
 plugins {
+  id 'maven-publish'
+  id 'com.gradle.plugin-publish' version '0.9.0'
   id 'eclipse'
-  id 'nu.studer.plugindev' version '1.0.3'
   id 'groovy'
 }
 
-group "edu.sc.seis.gradle"
-version "2.1.1-SNAPSHOT"
+group = "edu.sc.seis"
+version = "2.1.1-SNAPSHOT"
 
-plugindev {
-    pluginId = 'edu.sc.seis.macAppBundle'
-    pluginImplementationClass 'edu.sc.seis.gradle.macAppBundle.MacAppBundlePlugin'
-    pluginDescription 'A Gradle Plugin to create a Mac OSX .app application based on the project. '
-    pluginLicenses 'Apache-2.0'
-    pluginTags 'gradle', 'plugin', 'macappbundle'
-    authorId 'crotwell'
-    authorName 'Philip Crotwell'
-    authorEmail 'crotwell@seis.sc.edu'
-    projectUrl 'https://code.google.com/p/gradle-macappbundle/'
-    projectIssuesUrl 'https://code.google.com/p/gradle-macappbundle/issues/list'
-    projectVcsUrl 'https://code.google.com/p/gradle-macappbundle/source/checkout'
-    projectInceptionYear '2012'
-    done() // do not omit this
+
+dependencies {
+  compile gradleApi()
+  compile localGroovy() //not needed for Java plugins
+  // other dependencies that your plugin requires
 }
 
-// make sure to define the bintray properties after the 'plugindev' extension
-bintray {
-    user = "$BINTRAY_USER"
-    key = "$BINTRAY_API_KEY"
-    pkg.repo = 'gradle-plugins'
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
 }
+
+pluginBundle {
+    website = 'https://github.com/crotwell/gradle-macappbundle'
+    vcsUrl = 'https://github.com/crotwell/gradle-macappbundle.git'
+    description = 'A Gradle Plugin to create a Mac OSX .app application based on the project. '
+
+    plugins {
+      macappbundle {
+        id = 'edu.sc.seis.macAppBundle'
+        displayName = 'MacApp Bundle plugin'
+        tags = [ 'gradle', 'plugin', 'macappbundle']
+      }
+    }
+
+//    pluginImplementationClass 'edu.sc.seis.gradle.macAppBundle.MacAppBundlePlugin'
+//    pluginLicenses 'Apache-2.0'
+//    authorId 'crotwell'
+//    authorName 'Philip Crotwell'
+//    authorEmail 'crotwell@seis.sc.edu'
+//    projectInceptionYear '2012'
+//    done() // do not omit this
+}
+
 
 
 
