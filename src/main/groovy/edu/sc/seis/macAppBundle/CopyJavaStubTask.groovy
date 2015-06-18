@@ -13,12 +13,9 @@ class CopyJavaStubTask extends DefaultTask {
         dest.parentFile.mkdirs()
         def outStream = new BufferedOutputStream(new FileOutputStream(dest))
         def buf = new byte[1024]
-        Class thisClass = edu.sc.seis.gradle.macAppBundle.CopyJavaStubTask.class;
-        def url = thisClass.getClassLoader().getResource("edu/sc/seis/gradle/macAppBundle/${->project.macAppBundle.bundleExecutable}");
-        
-        def JarURLConnection conn = url.openConnection();
-        conn.connect();
-        def inStream = url.openStream();
+        Class thisClass = edu.sc.seis.macAppBundle.CopyJavaStubTask.class;
+        def url = thisClass.getClassLoader().getResource("edu/sc/seis/macAppBundle/${->project.macAppBundle.bundleExecutable}");
+        def inStream = thisClass.getClassLoader().getResourceAsStream("edu/sc/seis/macAppBundle/${->project.macAppBundle.bundleExecutable}");
         if (inStream == null) throw new RuntimeException("Can't find resource for ${->project.macAppBundle.bundleExecutable} in jar "+url+"  "+thisClass.getName())
         int numRead = inStream.read(buf)
         while (numRead > 0) {
