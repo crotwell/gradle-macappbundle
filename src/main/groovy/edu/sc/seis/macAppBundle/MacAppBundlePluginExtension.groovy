@@ -124,7 +124,7 @@ class MacAppBundlePluginExtension implements Serializable {
     /** List of arguments to pass to the application. Only used for Oracle-style apps. */
     List arguments = []
     
-    /* subdir of the Contents dir to put the jar files. Defaults to Java for Oracle and
+    /** subdir of the Contents dir to put the jar files. Defaults to Java for Oracle and
      * to Resources/Java for Apple.
      */
     String jarSubdir = 'Java'
@@ -223,10 +223,12 @@ class MacAppBundlePluginExtension implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
+        result = prime * result + ((appStyle == null) ? 0 : appStyle.hashCode());
         result = prime * result + ((creatorCode == null) ? 0 : creatorCode.hashCode());
         result = prime * result + ((icon == null) ? 0 : icon.hashCode());
         result = prime * result + ((jvmVersion == null) ? 0 : jvmVersion.hashCode());
         result = prime * result + ((mainClassName == null) ? 0 : mainClassName.hashCode());
+        result = prime * result + ((bundleIdentifier == null) ? 0 : bundleIdentifier.hashCode());
         result = prime * result + ((appOutputDir == null) ? 0 : appOutputDir.hashCode());
         result = prime * result + ((dmgOutputDir == null) ? 0 : dmgOutputDir.hashCode());
         result = prime * result + ((setFileCmd == null) ? 0 : setFileCmd.hashCode());
@@ -234,11 +236,12 @@ class MacAppBundlePluginExtension implements Serializable {
         result = prime * result + ((appName == null) ? 0 : appName.hashCode());
         result = prime * result + ((volumeName == null) ? 0 : volumeName.hashCode());
         result = prime * result + ((dmgName == null) ? 0 : dmgName.hashCode());
-        result = prime * result + (javaProperties == null ? 0 : javaProperties.hashCode);
-        result = prime * result + (javaExtras == null ? 0 : javaExtras.hashCode);
-        result = prime * result + (bundleExtras == null ? 0 : bundleExtras.hashCode);
+        result = prime * result + ((javaProperties == null || javaProperties.isEmpty()) ? 0 : javaProperties.hashCode());
+        result = prime * result + ((javaExtras == null) ? 0 : javaExtras.hashCode());
+        result = prime * result + ((bundleExtras == null) ? 0 : bundleExtras.hashCode());
         result = prime * result + ((bundleExecutable == null) ? 0 : bundleExecutable.hashCode());
         result = prime * result + (bundleAllowMixedLocalizations ? 1231 : 1237);
+        result = prime * result + (highResolutionCapable ? 1231 : 1237);
         result = prime * result + ((bundlePackageType == null) ? 0 : bundlePackageType.hashCode());
         result = prime * result + ((bundleInfoDictionaryVersion == null) ? 0 : bundleInfoDictionaryVersion.hashCode());
         result = prime * result + ((bundleDevelopmentRegion == null) ? 0 : bundleDevelopmentRegion.hashCode());
@@ -263,6 +266,11 @@ class MacAppBundlePluginExtension implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         MacAppBundlePluginExtension other = (MacAppBundlePluginExtension)obj;
+        if (appStyle == null) {
+            if (other.appStyle != null)
+                return false;
+        } else if (!appStyle.equals(other.appStyle))
+            return false;
         if (creatorCode == null) {
             if (other.creatorCode != null)
                 return false;
@@ -282,6 +290,11 @@ class MacAppBundlePluginExtension implements Serializable {
             if (other.mainClassName != null)
                 return false;
         } else if (!mainClassName.equals(other.mainClassName))
+            return false;
+        if (bundleIdentifier == null) {
+            if (other.bundleIdentifier != null)
+                return false;
+        } else if (!bundleIdentifier.equals(other.bundleIdentifier))
             return false;
         if (appOutputDir == null) {
             if (other.appOutputDir != null)
@@ -324,6 +337,8 @@ class MacAppBundlePluginExtension implements Serializable {
         } else if (!bundleExecutable.equals(other.bundleExecutable))
             return false;
         if (bundleAllowMixedLocalizations != other.bundleAllowMixedLocalizations)
+            return false;
+        if (highResolutionCapable != other.highResolutionCapable)
             return false;
         if (bundlePackageType == null) {
             if (other.bundlePackageType != null)
