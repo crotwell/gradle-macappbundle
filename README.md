@@ -1,6 +1,6 @@
 A [Gradle](http://www.gradle.org) Plugin to create a Mac OSX .app application based on the project.
 
-**Version 2.1.0 released 20 March 2015.**
+**Version 2.1.1 released 18 June 2015.**
 
 Now available via the Gradle Plugin Portal. Please see:
 http://plugins.gradle.org/plugin/edu.sc.seis.macAppBundle
@@ -12,7 +12,7 @@ As of version 1.0.9, the macappbundle is available from mavenCentral, which fixe
 For gradle 2.1:
 ```
 plugins {
-  id "edu.sc.seis.macAppBundle" version "2.1.0"
+  id "edu.sc.seis.macAppBundle" version "2.1.1"
 }
 ```
 
@@ -31,7 +31,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'edu.sc.seis.gradle:macappbundle:2.1.0'
+        classpath 'edu.sc.seis.gradle:macappbundle:2.1.1'
     }
 }
 ```
