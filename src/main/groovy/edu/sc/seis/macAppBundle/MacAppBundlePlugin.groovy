@@ -35,10 +35,9 @@ class MacAppBundlePlugin implements Plugin<Project> {
     static final String TASK_CREATE_ZIP = "createAppZip"
 
 
-    def void apply(Project project) {
+    void apply(Project project) {
         project.plugins.apply(JavaPlugin)
-        MacAppBundlePluginExtension pluginExtension = new MacAppBundlePluginExtension()
-        project.extensions.macAppBundle = pluginExtension
+        def pluginExtension = project.extensions.create("macAppBundle", MacAppBundlePluginExtension)
         project.afterEvaluate {
             // this needs to happen after the extension has been populated, but
             // before any tasks run
@@ -88,7 +87,43 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.description = "Creates the Info.plist configuration file inside the mac osx .app directory."
         task.group = GROUP
         task.inputs.property("project version", {project.version})
-        task.inputs.property("MacAppBundlePlugin extension", {project.macAppBundle})
+        //task.inputs.property("MacAppBundlePlugin extension", {project.macAppBundle})
+        task.inputs.property("MacAppBundlePlugin appStyle", {project.macAppBundle.appStyle})
+        task.inputs.property("MacAppBundlePlugin setFileCmd", {project.macAppBundle.setFileCmd})
+        task.inputs.property("MacAppBundlePlugin appOutputDir", {project.macAppBundle.appOutputDir})
+        task.inputs.property("MacAppBundlePlugin dmgOutputDir", {project.macAppBundle.dmgOutputDir})
+        task.inputs.property("MacAppBundlePlugin mainClassName", {project.macAppBundle.mainClassName})
+        task.inputs.property("MacAppBundlePlugin bundleIdentifier", {project.macAppBundle.bundleIdentifier})
+        task.inputs.property("MacAppBundlePlugin creatorCode", {project.macAppBundle.creatorCode})
+        task.inputs.property("MacAppBundlePlugin icon", {project.macAppBundle.icon})
+        task.inputs.property("MacAppBundlePlugin jvmVersion", {project.macAppBundle.jvmVersion})
+        task.inputs.property("MacAppBundlePlugin backgroundImage", {project.macAppBundle.backgroundImage})
+        task.inputs.property("MacAppBundlePlugin appName", {project.macAppBundle.appName})
+        task.inputs.property("MacAppBundlePlugin volumeName", {project.macAppBundle.volumeName})
+        task.inputs.property("MacAppBundlePlugin dmgName", {project.macAppBundle.dmgName})
+        task.inputs.property("MacAppBundlePlugin javaProperties", {project.macAppBundle.javaProperties})
+        task.inputs.property("MacAppBundlePlugin javaExtras", {project.macAppBundle.javaExtras})
+        task.inputs.property("MacAppBundlePlugin bundleExtras", {project.macAppBundle.bundleExtras})
+        task.inputs.property("MacAppBundlePlugin arguments", {project.macAppBundle.arguments})
+        task.inputs.property("MacAppBundlePlugin bundleExecutable", {project.macAppBundle.bundleExecutable})
+        task.inputs.property("MacAppBundlePlugin bundleAllowMixedLocalizations", {project.macAppBundle.bundleAllowMixedLocalizations})
+        task.inputs.property("MacAppBundlePlugin highResolutionCapable", {project.macAppBundle.highResolutionCapable})
+        task.inputs.property("MacAppBundlePlugin bundlePackageType", {project.macAppBundle.bundlePackageType})
+        task.inputs.property("MacAppBundlePlugin bundleInfoDictionaryVersion", {project.macAppBundle.bundleInfoDictionaryVersion})
+        task.inputs.property("MacAppBundlePlugin bundleDevelopmentRegion", {project.macAppBundle.bundleDevelopmentRegion})
+        task.inputs.property("MacAppBundlePlugin bundleJRE", {project.macAppBundle.bundleJRE})
+        task.inputs.property("MacAppBundlePlugin jreHome", {project.macAppBundle.jreHome})
+        task.inputs.property("MacAppBundlePlugin certIdentity", {project.macAppBundle.certIdentity})
+        task.inputs.property("MacAppBundlePlugin codeSignCmd", {project.macAppBundle.codeSignCmd})
+        task.inputs.property("MacAppBundlePlugin codeSignDeep", {project.macAppBundle.codeSignDeep})
+        task.inputs.property("MacAppBundlePlugin keyChain", {project.macAppBundle.keyChain})
+        task.inputs.property("MacAppBundlePlugin backgroundScript", {project.macAppBundle.backgroundScript})
+        task.inputs.property("MacAppBundlePlugin appIconX", {project.macAppBundle.appIconX})
+        task.inputs.property("MacAppBundlePlugin appIconY", {project.macAppBundle.appIconY})
+        task.inputs.property("MacAppBundlePlugin appFolderX", {project.macAppBundle.appFolderX})
+        task.inputs.property("MacAppBundlePlugin appFolderY", {project.macAppBundle.appFolderY})
+        task.inputs.property("MacAppBundlePlugin backgroundImageWidth", {project.macAppBundle.backgroundImageWidth})
+        task.inputs.property("MacAppBundlePlugin backgroundImageHeight", {project.macAppBundle.backgroundImageHeight})
         return task
     }
 
