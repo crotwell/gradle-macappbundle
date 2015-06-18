@@ -15,6 +15,7 @@ class MacAppBundlePluginExtension implements Serializable {
      */
     void configureDefaults(Project project) {
         if (appName == null) appName = "${->project.name}"
+        if (bundleIdentifier == null) bundleIdentifier = "${->mainClassName}"
         if (volumeName == null) volumeName = "${->project.name}-${->project.version}"
         if (dmgName == null) dmgName = "${->project.name}-${->project.version}"
         if (jvmVersion == null) jvmVersion = project.targetCompatibility.toString()+"+"
@@ -79,6 +80,9 @@ class MacAppBundlePluginExtension implements Serializable {
 
     /** The initial class to start the application, must contain a public static void main method. */ 
     String mainClassName
+    
+    /** The CFBundleIdentifier, defaults to mainClassName. */
+    String bundleIdentifier
     
     /** Creator code, issued by Apple. Four question marks is the default if no code has been issued. */
     String creatorCode = '????'

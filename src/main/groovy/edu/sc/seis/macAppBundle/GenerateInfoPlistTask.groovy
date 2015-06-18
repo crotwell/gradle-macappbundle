@@ -52,7 +52,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 key('CFBundleIconFile')
                 string(project.file(extension.icon).name)
                 key('CFBundleIdentifier')
-                string(extension.mainClassName)
+                string(extension.bundleIdentifier)
                 
                 key('CFBundleInfoDictionaryVersion')
                 string(extension.bundleInfoDictionaryVersion)
@@ -125,7 +125,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 key('CFBundleName')
                 string(extension.appName)
                 key('CFBundleIdentifier')
-                string(extension.mainClassName)
+                string(extension.bundleIdentifier)
                 key('CFBundleShortVersionString')
                 string(project.version)
                 key('CFBundleVersion')
