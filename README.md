@@ -27,11 +27,14 @@ macAppBundle {
 }
 
 buildscript {
-    repositories {
-        jcenter()
+  repositories {
+    maven {
+      url "https://plugins.gradle.org/m2/"
     }
-    dependencies {
-        classpath 'edu.sc.seis.gradle:macappbundle:2.1.1'
-    }
+  }
+  dependencies {
+    classpath "gradle.plugin.edu.sc.seis:macAppBundle:2.1.1"
+  }
 }
+
 ```
