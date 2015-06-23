@@ -20,7 +20,7 @@ or for earlier versions of Gradle:
 
 ```
 
-apply plugin: 'macAppBundle'
+apply plugin: 'edu.sc.seis.macAppBundle'
 
 macAppBundle {
     mainClassName = "com.example.myApp.Start"
