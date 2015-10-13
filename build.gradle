@@ -34,7 +34,7 @@ pluginBundle {
       macappbundle {
         id = 'edu.sc.seis.macAppBundle'
         displayName = 'MacApp Bundle plugin'
-        tags = [ 'gradle', 'plugin', 'macappbundle']
+        tags = [ 'gradle', 'plugin', 'macappbundle', 'dmg', 'osx']
       }
     }
 
