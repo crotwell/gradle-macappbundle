@@ -1,4 +1,4 @@
-A [Gradle](http://www.gradle.org) Plugin to create a Mac OSX .app application based on the project.
+A [Gradle](http://www.gradle.org) Plugin to create a Mac OSX .app application and dmg based on the project.
 
 **Version 2.1.2 released 13 October 2015.**
 
