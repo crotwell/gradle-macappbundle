@@ -167,7 +167,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         Task task = project.tasks.create(TASK_BUNDLE_JRE_NAME, Sync)
         task.description = "Copies the JRE into the Contents/PlugIns directory."
         task.group = GROUP
-        task.from("${->project.macAppBundle.jreHome}/../..") {
+        task.from("${->project.macAppBundle.getJreHome()}/../..") {
             include('Contents/Home/jre/**')
             include('Contents/Info.plist')
             exclude('Contents/Home/jre/bin')

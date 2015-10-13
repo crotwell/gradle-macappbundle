@@ -21,26 +21,6 @@ class MacAppBundlePluginExtension implements Serializable {
         if (jvmVersion == null) jvmVersion = project.targetCompatibility.toString()+"+"
         if (dmgOutputDir == null) dmgOutputDir = "${->project.distsDirName}"
         setAppStyle(appStyle)
-        if (appStyle == 'Oracle' && bundleJRE) {
-            if(jreHome == null) {
-                File jhFile = new File("/usr/libexec/java_home");
-                if ( ! jhFile.exists()) {
-                    throw new RuntimeException("bundleJRE not set and unable to find "+command+", is oracle java installed?");
-                }
-                def command = """/usr/libexec/java_home"""// Create the String
-                def proc = command.execute()                 // Call *execute* on the string
-                proc.waitFor()                               // Wait for the command to finish
-
-                // Obtain status and output
-                def retCode = proc.exitValue();
-                if (retCode == 0) { 
-                    // *out* from the external program is *in* for groovy
-                    jreHome = proc.in.text.trim();
-                } else {
-                    throw new RuntimeException("bundleJRE not set and return code of "+command+" is nonzero: "+retCode);
-                } 
-            }
-         }
     }
     
     /** The style of .app created. Use 'Apple' for the original Apple Java in OSX 10.8 and earlier. Starting in
@@ -215,8 +195,32 @@ class MacAppBundlePluginExtension implements Serializable {
      end tell
 """
     
+    String getJreHome() {
+System.out.println(" getJreHome() called    ");
+        // ensure jreHome is set, finding it if needed, before running task
+        if (jreHome == null && appStyle == 'Oracle') {
+            String javaHomeCommand = """/usr/libexec/java_home"""// Create the String
+            File jhFile = new File((String)javaHomeCommand);
+            if ( ! jhFile.exists()) {
+                throw new RuntimeException("jreHome not set and unable to find "+javaHomeCommand+", is oracle java installed?");
+            }
+            def proc = javaHomeCommand.execute() // Call *execute* on the string
+            proc.waitFor()                       // Wait for the command to finish
+
+            // Obtain status and output
+            def retCode = proc.exitValue();
+            if (retCode == 0) {
+                // *out* from the external program is *in* for groovy
+                return proc.in.text.trim();
+            } else {
+                throw new RuntimeException("jreHome not set and return code of "+javaHomeCommand+" is nonzero: "+retCode);
+            }
+        }
+        return jreHome;
+    }
+
     public String getJREDirName() {
-        return new File(jreHome).getParentFile().getParentFile().getName()
+        return new File(getJreHome()).getParentFile().getParentFile().getName()
     }
 
     @Override
