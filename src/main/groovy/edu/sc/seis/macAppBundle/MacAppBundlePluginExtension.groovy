@@ -2,6 +2,8 @@ package edu.sc.seis.macAppBundle
 
 import java.io.File;
 
+import org.apache.tools.ant.taskdefs.condition.Os;
+
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project;
@@ -198,7 +200,7 @@ class MacAppBundlePluginExtension implements Serializable {
     String getJreHome() {
 System.out.println(" getJreHome() called    ");
         // ensure jreHome is set, finding it if needed, before running task
-        if (jreHome == null && appStyle == 'Oracle') {
+        if (jreHome == null && Os.isFamily(Os.FAMILY_MAC && appStyle == 'Oracle') {
             String javaHomeCommand = """/usr/libexec/java_home"""// Create the String
             File jhFile = new File((String)javaHomeCommand);
             if ( ! jhFile.exists()) {

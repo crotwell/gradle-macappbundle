@@ -72,9 +72,14 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 key('CFBundleSignature')
                 string(extension.creatorCode)
                 if (extension.bundleJRE) {
-                    def jreVersion = new File(extension.getJreHome()).getParentFile().getParentFile().getName()
-                    key('JVMRuntime')
-                    string(jreVersion)
+                    if (extension.getJreHome() != null) {
+                        File jreHomeFile = new File(extension.getJreHome());
+                        if (jreHomeFile.exists()) {
+                            def jreVersion = jreHomeFile.getParentFile().getParentFile().getName()
+                            key('JVMRuntime')
+                            string(jreVersion)
+                        }
+                    }
                 }
                 key('JVMMainClassName')
                 string(extension.mainClassName)
