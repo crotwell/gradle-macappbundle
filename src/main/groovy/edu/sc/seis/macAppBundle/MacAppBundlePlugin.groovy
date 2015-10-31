@@ -167,25 +167,27 @@ class MacAppBundlePlugin implements Plugin<Project> {
         Task task = project.tasks.create(TASK_BUNDLE_JRE_NAME, Sync)
         task.description = "Copies the JRE into the Contents/PlugIns directory."
         task.group = GROUP
-        
-        if (project.macAppBundle.bundleJRE && project.macAppBundle.getJreHome() != null) {
-            task.from("${->project.macAppBundle.getJreHome()}/../..") {
-                include('Contents/Home/jre/**')
-                include('Contents/Info.plist')
-                exclude('Contents/Home/jre/bin')
-                exclude('Contents/Home/"bin/')
-                exclude('Contents/Home/jre/bin/')
-                exclude('Contents/Home/jre/lib/deploy/')
-                exclude('Contents/Home/jre/lib/deploy.jar')
-                exclude('Contents/Home/jre/lib/javaws.jar')
-                exclude('Contents/Home/jre/lib/libdeploy.dylib')
-                exclude('Contents/Home/jre/lib/libnpjp2.dylib')
-                exclude('Contents/Home/jre/lib/plugin.jar')
-                exclude('Contents/Home/jre/lib/security/javaws.policy')
+       
+        project.afterEvaluate {
+            if (project.macAppBundle.bundleJRE && project.macAppBundle.getJreHome() != null) {
+                task.from("${->project.macAppBundle.getJreHome()}/../..") {
+                    include('Contents/Home/jre/**')
+                    include('Contents/Info.plist')
+                    exclude('Contents/Home/jre/bin')
+                    exclude('Contents/Home/"bin/')
+                    exclude('Contents/Home/jre/bin/')
+                    exclude('Contents/Home/jre/lib/deploy/')
+                    exclude('Contents/Home/jre/lib/deploy.jar')
+                    exclude('Contents/Home/jre/lib/javaws.jar')
+                    exclude('Contents/Home/jre/lib/libdeploy.dylib')
+                    exclude('Contents/Home/jre/lib/libnpjp2.dylib')
+                    exclude('Contents/Home/jre/lib/plugin.jar')
+                    exclude('Contents/Home/jre/lib/security/javaws.policy')
+                }
+                task.into "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/PlugIns/${->project.macAppBundle.getJREDirName()}"
             }
-            task.into "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/PlugIns/${->project.macAppBundle.getJREDirName()}"
+            task.onlyIf { project.macAppBundle.bundleJRE }
         }
-        task.onlyIf { project.macAppBundle.bundleJRE }
         return task
     }
 
