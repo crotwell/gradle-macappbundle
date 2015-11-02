@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "edu.sc.seis"
-version = "2.1.3-SNAPSHOT"
+version = "2.1.3"
 
 
 dependencies {

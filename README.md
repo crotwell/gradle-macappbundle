@@ -1,18 +1,19 @@
 A [Gradle](http://www.gradle.org) Plugin to create a Mac OSX .app application and dmg based on the project.
 
-**Version 2.1.2 released 13 October 2015.**
+**Version 2.1.3 released 2 November 2015.**
 
 Now available via the Gradle Plugin Portal. Please see:
 http://plugins.gradle.org/plugin/edu.sc.seis.macAppBundle
 
 To add to a gradle project, add this to build.gradle and run **gradle createApp** or **gradle createDmg**. The first should work on most systems, the second will only work on Mac OSX as it uses hdiutils which is a Mac-only application. Also see the [Wiki](https://github.com/crotwell/gradle-macappbundle/wiki/Intro) for more information.
 
-As of version 1.0.9, the macappbundle is available from mavenCentral, which fixes an issue with downloads no longer working in Gradle from code.google.com. The groupId and artifactId have also changed to edu.sc.seis.gradle and macappbundle.
+As of version 1.0.9, the 
+groupId and artifactId changed to edu.sc.seis.gradle and macappbundle.
 
-For gradle 2.1:
+For gradle 2.1 or later:
 ```
 plugins {
-  id "edu.sc.seis.macAppBundle" version "2.1.2"
+  id "edu.sc.seis.macAppBundle" version "2.1.3"
 }
 ```
 
@@ -33,7 +34,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath "gradle.plugin.edu.sc.seis:macAppBundle:2.1.2"
+    classpath "gradle.plugin.edu.sc.seis:macAppBundle:2.1.3"
   }
 }
 
