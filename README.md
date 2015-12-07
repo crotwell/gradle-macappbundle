@@ -1,6 +1,6 @@
 A [Gradle](http://www.gradle.org) Plugin to create a Mac OSX .app application and dmg based on the project.
 
-**Version 2.1.3 released 2 November 2015.**
+**Version 2.1.4 released 7 December 2015.**
 
 Now available via the Gradle Plugin Portal. Please see:
 http://plugins.gradle.org/plugin/edu.sc.seis.macAppBundle
@@ -13,7 +13,7 @@ groupId and artifactId changed to edu.sc.seis.gradle and macappbundle.
 For gradle 2.1 or later:
 ```
 plugins {
-  id "edu.sc.seis.macAppBundle" version "2.1.3"
+  id "edu.sc.seis.macAppBundle" version "2.1.4"
 }
 ```
 
