@@ -1,5 +1,6 @@
 package edu.sc.seis.macAppBundle;
 
+import org.apache.tools.ant.taskdefs.condition.Os;
 import org.gradle.api.Project;
 import org.gradle.api.Plugin;
 import org.gradle.api.Task;
@@ -79,7 +80,11 @@ class MacAppBundlePlugin implements Plugin<Project> {
         zipTask.dependsOn(createAppTask)
         zipTask.mustRunAfter codeSignTask
         zipTask.mustRunAfter setFileTask
-        project.getTasksByName("assemble", true).each{ t -> t.dependsOn(dmgTask) }
+        if (Os.isFamily(Os.FAMILY_MAC) {
+            project.getTasksByName("assemble", true).each{ t -> t.dependsOn(dmgTask) }
+        } else {
+            project.getTasksByName("assemble", true).each{ t -> t.dependsOn(zipTask) }
+        }
     }
 
     private Task addCreateInfoPlistTask(Project project) {
