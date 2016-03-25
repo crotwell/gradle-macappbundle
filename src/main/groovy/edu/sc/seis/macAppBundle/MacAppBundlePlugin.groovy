@@ -269,9 +269,9 @@ class MacAppBundlePlugin implements Plugin<Project> {
             }
             task.doLast {
                 String backgroundImage = new File(project.macAppBundle.backgroundImage).getName() // just name, not paths    
-                def imageWidth = runCmd("sips -g pixelWidth ${->project.buildDir}/${->project.macAppBundle.appOutputDir}/.background/${backgroundImage}", "Unable to determine image size with sips")
+                def imageWidth = runCmd(["sips", "-g", "pixelWidth", "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/.background/${backgroundImage}"], "Unable to determine image size with sips")
                 imageWidth = imageWidth.tokenize()[2];
-                def imageHeight = runCmd("sips -g pixelHeight ${->project.buildDir}/${->project.macAppBundle.appOutputDir}/.background/${backgroundImage}", "Unable to determine image size with sips")
+                def imageHeight = runCmd(["sips", "-g", "pixelHeight", "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/.background/${backgroundImage}"], "Unable to determine image size with sips")
                 imageHeight = imageHeight.tokenize()[2];
                 project.macAppBundle.backgroundImageWidth = imageWidth
                 project.macAppBundle.backgroundImageHeight = imageHeight
@@ -378,17 +378,16 @@ class MacAppBundlePlugin implements Plugin<Project> {
                                               String appFolderX, String appFolderY) {
         if (new File("/Volumes/${volMountPoint}").exists()) {
             // if volume already mounted, maybe due to previous build, unmount
-            runCmd("hdiutil detach /Volumes/${volMountPoint}", "Unable to detach volume: ${volMountPoint}")
+            runCmd(["hdiutil", "detach", "/Volumes/${volMountPoint}"], "Unable to detach volume: ${volMountPoint}")
         }
+
         // mount temp dmg
-        def mountCmdText = "hdiutil attach -readwrite -noverify ${dmgOutDir}/${tmpDmgFile}"
-
-        String mountCmdOut = runCmd(mountCmdText, "Unable to mount dmg")
+        String mountCmdOut = runCmd(["hdiutil", "attach", "-readwrite", "-noverify", "${dmgOutDir}/${tmpDmgFile}"], "Unable to mount dmg")
         if ( ! new File("/Volumes/${volMountPoint}").exists()) {
-            throw new RuntimeException("Unable to find volume mount point to set background image. ${volMMountPoint}")
+            throw new RuntimeException("Unable to find volume mount point to set background image. ${volMountPoint}")
         }
 
-        runCmd("ln -s /Applications /Volumes/${volMountPoint}", "Unable to link /Applications in dmg");
+        runCmd(["ln", "-s", "/Applications", "/Volumes/${volMountPoint}"], "Unable to link /Applications in dmg");
         
         def binding = ["APP_NAME":appName, "VOL_NAME":volMountPoint, "DMG_BACKGROUND_IMG":backgroundImage,
             "IMAGE_WIDTH":imageWidth,
@@ -408,24 +407,20 @@ class MacAppBundlePlugin implements Plugin<Project> {
         if (retCode != 0) {
             throw new RuntimeException("Problem running applescript to set dmg background image: "+retCode+" "+appleScriptCmd.err.text);
         }
-        runCmd("hdiutil detach /Volumes/${volMountPoint}", "Unable to detach volume: ${volMountPoint}")
-        runCmd("hdiutil convert ${dmgOutDir}/${tmpDmgFile} -format UDZO -imagekey zlib-level=9 -o ${dmgOutDir}/${finalDmgFile}", "Unable to convert dmg image")
+        runCmd(["hdiutil", "detach", "/Volumes/${volMountPoint}"], "Unable to detach volume: ${volMountPoint}")
+        runCmd(["hdiutil", "convert", "${dmgOutDir}/${tmpDmgFile}", "-format", "UDZO", "-imagekey", "zlib-level=9", "-o", "${dmgOutDir}/${finalDmgFile}"], "Unable to convert dmg image")
         new File("${dmgOutDir}/${tmpDmgFile}").delete()
     }
 
-    private String runCmd(GString cmdText, String errMsg) {
-        return runCmd(cmdText, GString.EMPTY + errMsg);
-    }
-
-    private String runCmd(GString cmdText, GString errMsg) {
+    private String runCmd(List cmd, String errMsg) {
         def sout = new StringBuffer()
         def serr = new StringBuffer()
-        def cmd = cmdText.execute()
-        cmd.consumeProcessOutput(sout, serr)
-        cmd.waitFor();
-        def retCode = cmd.exitValue();
+        def cmdProc = cmd.execute()
+        cmdProc.consumeProcessOutput(sout, serr)
+        cmdProc.waitFor();
+        def retCode = cmdProc.exitValue();
         if (retCode != 0) {
-            throw new RuntimeException("${errMsg}, return code from '${cmdText}' is nonzero: ${retCode}  ${serr}");
+            throw new RuntimeException("${errMsg}, return code from '${cmd.join(' ')}' is nonzero: ${retCode}  ${serr}");
         }
         return sout
     }
