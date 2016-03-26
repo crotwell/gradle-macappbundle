@@ -1,6 +1,7 @@
 package edu.sc.seis.macAppBundle
 
 import java.io.File;
+import java.util.Objects;
 
 import org.apache.tools.ant.taskdefs.condition.Os;
 
@@ -226,40 +227,37 @@ class MacAppBundlePluginExtension implements Serializable {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((appStyle == null) ? 0 : appStyle.hashCode());
-        result = prime * result + ((creatorCode == null) ? 0 : creatorCode.hashCode());
-        result = prime * result + ((icon == null) ? 0 : icon.hashCode());
-        result = prime * result + ((jvmVersion == null) ? 0 : jvmVersion.hashCode());
-        result = prime * result + ((mainClassName == null) ? 0 : mainClassName.hashCode());
-        result = prime * result + ((bundleIdentifier == null) ? 0 : bundleIdentifier.hashCode());
-        result = prime * result + ((appOutputDir == null) ? 0 : appOutputDir.hashCode());
-        result = prime * result + ((dmgOutputDir == null) ? 0 : dmgOutputDir.hashCode());
-        result = prime * result + ((setFileCmd == null) ? 0 : setFileCmd.hashCode());
-        result = prime * result + ((backgroundImage == null) ? 0 : backgroundImage.hashCode());
-        result = prime * result + ((appName == null) ? 0 : appName.hashCode());
-        result = prime * result + ((volumeName == null) ? 0 : volumeName.hashCode());
-        result = prime * result + ((dmgName == null) ? 0 : dmgName.hashCode());
-        result = prime * result + ((javaProperties == null || javaProperties.isEmpty()) ? 0 : javaProperties.hashCode());
-        result = prime * result + ((javaExtras == null) ? 0 : javaExtras.hashCode());
-        result = prime * result + ((bundleExtras == null) ? 0 : bundleExtras.hashCode());
-        result = prime * result + ((bundleExecutable == null) ? 0 : bundleExecutable.hashCode());
-        result = prime * result + (bundleAllowMixedLocalizations ? 1231 : 1237);
-        result = prime * result + (highResolutionCapable ? 1231 : 1237);
-        result = prime * result + ((bundlePackageType == null) ? 0 : bundlePackageType.hashCode());
-        result = prime * result + ((bundleInfoDictionaryVersion == null) ? 0 : bundleInfoDictionaryVersion.hashCode());
-        result = prime * result + ((bundleDevelopmentRegion == null) ? 0 : bundleDevelopmentRegion.hashCode());
-        result = prime * result + ((arguments == null) ? 0 : arguments.hashCode());
-        result = prime * result + (bundleJRE ? 1231 : 1237);
-        result = prime * result + ((jreHome == null) ? 0 : jreHome.hashCode());
-        result = prime * result + ((certIdentity == null) ? 0 : certIdentity.hashCode());
-        result = prime * result + ((codeSignCmd == null) ? 0 : codeSignCmd.hashCode());
-        result = prime * result + (codeSignDeep ? 1231 : 1237);
-        result = prime * result + ((keyChain == null) ? 0 : keyChain.hashCode());
-        result = prime * result + ((backgroundScript == null) ? 0 : backgroundScript.hashCode());
-        
-        return result;
+        return Objects.hash(
+                appStyle,
+                creatorCode,
+                icon,
+                jvmVersion,
+                mainClassName,
+                bundleIdentifier,
+                appOutputDir,
+                dmgOutputDir,
+                setFileCmd,
+                backgroundImage,
+                appName,
+                volumeName,
+                dmgName,
+                javaProperties,
+                javaExtras,
+                bundleExtras,
+                bundleExecutable,
+                bundleAllowMixedLocalizations,
+                highResolutionCapable,
+                bundlePackageType,
+                bundleInfoDictionaryVersion,
+                bundleDevelopmentRegion,
+                arguments,
+                bundleJRE,
+                jreHome,
+                certIdentity,
+                codeSignCmd,
+                codeSignDeep,
+                keyChain,
+                backgroundScript);
     }
 
     @Override
@@ -271,148 +269,37 @@ class MacAppBundlePluginExtension implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         MacAppBundlePluginExtension other = (MacAppBundlePluginExtension)obj;
-        if (appStyle == null) {
-            if (other.appStyle != null)
-                return false;
-        } else if (!appStyle.equals(other.appStyle))
-            return false;
-        if (creatorCode == null) {
-            if (other.creatorCode != null)
-                return false;
-        } else if (!creatorCode.equals(other.creatorCode))
-            return false;
-        if (icon == null) {
-            if (other.icon != null)
-                return false;
-        } else if (!icon.equals(other.icon))
-            return false;
-        if (jvmVersion == null) {
-            if (other.jvmVersion != null)
-                return false;
-        } else if (!jvmVersion.equals(other.jvmVersion))
-            return false;
-        if (mainClassName == null) {
-            if (other.mainClassName != null)
-                return false;
-        } else if (!mainClassName.equals(other.mainClassName))
-            return false;
-        if (bundleIdentifier == null) {
-            if (other.bundleIdentifier != null)
-                return false;
-        } else if (!bundleIdentifier.equals(other.bundleIdentifier))
-            return false;
-        if (appOutputDir == null) {
-            if (other.appOutputDir != null)
-                return false;
-        } else if (!appOutputDir.equals(other.appOutputDir))
-            return false;
-        if (dmgOutputDir == null) {
-            if (other.dmgOutputDir != null)
-                return false;
-        } else if (!dmgOutputDir.equals(other.dmgOutputDir))
-            return false;
-        if (setFileCmd == null) {
-            if (other.setFileCmd != null)
-                return false;
-        } else if (!setFileCmd.equals(other.setFileCmd))
-            return false;
-        if (backgroundImage == null) {
-            if (other.backgroundImage != null)
-                return false;
-        } else if (!backgroundImage.equals(other.backgroundImage))
-            return false;
-        if (appName == null) {
-            if (other.appName != null)
-                return false;
-        } else if (!appName.equals(other.appName))
-            return false;
-        if (volumeName == null) {
-            if (other.volumeName != null)
-                return false;
-        } else if (!volumeName.equals(other.volumeName))
-            return false;
-        if (dmgName == null) {
-            if (other.dmgName != null)
-                return false;
-        } else if (!dmgName.equals(other.dmgName))
-            return false;
-        if (bundleExecutable == null) {
-            if (other.bundleExecutable != null)
-                return false;
-        } else if (!bundleExecutable.equals(other.bundleExecutable))
-            return false;
-        if (bundleAllowMixedLocalizations != other.bundleAllowMixedLocalizations)
-            return false;
-        if (highResolutionCapable != other.highResolutionCapable)
-            return false;
-        if (bundlePackageType == null) {
-            if (other.bundlePackageType != null)
-                return false;
-        } else if (!bundlePackageType.equals(other.bundlePackageType))
-            return false;
-        if (bundleInfoDictionaryVersion == null) {
-            if (other.bundleInfoDictionaryVersion != null)
-                return false;
-        } else if (!bundleInfoDictionaryVersion.equals(other.bundleInfoDictionaryVersion))
-            return false;
-        if (bundleDevelopmentRegion == null) {
-            if (other.bundleDevelopmentRegion != null)
-                return false;
-        } else if (!bundleDevelopmentRegion.equals(other.bundleDevelopmentRegion))
-            return false;
-        if (bundleJRE != other.bundleJRE)
-            return false;
-        if (jreHome == null) {
-            if (other.jreHome != null)
-                return false;
-        } else if (!jreHome.equals(other.jreHome))
-            return false;
-        if (certIdentity == null) {
-            if (other.certIdentity != null)
-                return false;
-        } else if (!certIdentity.equals(other.certIdentity))
-            return false;
-        if (codeSignCmd == null) {
-            if (other.codeSignCmd != null)
-                return false;
-        } else if (!codeSignCmd.equals(other.codeSignCmd))
-            return false;
-        if (codeSignDeep != other.codeSignDeep)
-            return false;
-        if (keyChain == null) {
-            if (other.keyChain != null)
-                return false;
-        } else if (!keyChain.equals(other.keyChain))
-            return false;
-            
-        if (javaProperties == null) {
-            if (other.javaProperties != null)
-                return false;
-        } else if (!javaProperties.equals(other.javaProperties))
-            return false;
-        if (javaExtras == null) {
-            if (other.javaExtras != null)
-                return false;
-        } else if (!javaExtras.equals(other.javaExtras))
-            return false;
-        if (bundleExtras == null) {
-            if (other.bundleExtras != null)
-                return false;
-        } else if (!bundleExtras.equals(other.bundleExtras))
-            return false;
-        if (arguments == null) {
-            if (other.arguments != null)
-                return false;
-        } else if (!arguments.equals(other.arguments))
-            return false;
-        if (backgroundScript == null) {
-            if (other.backgroundScript != null)
-                return false;
-        } else if (!backgroundScript.equals(other.backgroundScript))
-            return false;
-            
-        return true;
+        return Objects.equals(appStyle, other.appStyle) &&
+                Objects.equals(creatorCode, other.creatorCode) &&
+                Objects.equals(icon, other.icon) &&
+                Objects.equals(jvmVersion, other.jvmVersion) &&
+                Objects.equals(mainClassName, other.mainClassName) &&
+                Objects.equals(bundleIdentifier, other.bundleIdentifier) &&
+                Objects.equals(appOutputDir, other.appOutputDir) &&
+                Objects.equals(dmgOutputDir, other.dmgOutputDir) &&
+                Objects.equals(setFileCmd, other.setFileCmd) &&
+                Objects.equals(backgroundImage, other.backgroundImage) &&
+                Objects.equals(appName, other.appName) &&
+                Objects.equals(volumeName, other.volumeName) &&
+                Objects.equals(dmgName, other.dmgName) &&
+                Objects.equals(bundleExecutable, other.bundleExecutable) &&
+                Objects.equals(bundleAllowMixedLocalizations, other.bundleAllowMixedLocalizations) &&
+                Objects.equals(highResolutionCapable, other.highResolutionCapable) &&
+                Objects.equals(bundlePackageType, other.bundlePackageType) &&
+                Objects.equals(bundleInfoDictionaryVersion, other.bundleInfoDictionaryVersion) &&
+                Objects.equals(bundleDevelopmentRegion, other.bundleDevelopmentRegion) &&
+                Objects.equals(bundleJRE, other.bundleJRE) &&
+                Objects.equals(jreHome, other.jreHome) &&
+                Objects.equals(certIdentity, other.certIdentity) &&
+                Objects.equals(codeSignCmd, other.codeSignCmd) &&
+                Objects.equals(codeSignDeep, other.codeSignDeep) &&
+                Objects.equals(keyChain, other.keyChain) &&
+                Objects.equals(javaProperties, other.javaProperties) &&
+                Objects.equals(javaExtras, other.javaExtras) &&
+                Objects.equals(bundleExtras, other.bundleExtras) &&
+                Objects.equals(arguments, other.arguments) &&
+                Objects.equals(backgroundScript, other.backgroundScript);
     }
-    
+
     
 }
