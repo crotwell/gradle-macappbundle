@@ -289,23 +289,23 @@ class MacAppBundlePluginExtension implements Serializable {
                 Objects.equals(volumeName, other.volumeName) &&
                 Objects.equals(dmgName, other.dmgName) &&
                 Objects.equals(bundleExecutable, other.bundleExecutable) &&
-                Objects.equals(bundleAllowMixedLocalizations, other.bundleAllowMixedLocalizations) &&
-                Objects.equals(highResolutionCapable, other.highResolutionCapable) &&
+                bundleAllowMixedLocalizations != other.bundleAllowMixedLocalizations &&
+                highResolutionCapable != other.highResolutionCapable &&
                 Objects.equals(bundlePackageType, other.bundlePackageType) &&
                 Objects.equals(bundleInfoDictionaryVersion, other.bundleInfoDictionaryVersion) &&
                 Objects.equals(bundleDevelopmentRegion, other.bundleDevelopmentRegion) &&
-                Objects.equals(bundleJRE, other.bundleJRE) &&
+                bundleJRE != other.bundleJRE &&
                 Objects.equals(jreHome, other.jreHome) &&
                 Objects.equals(certIdentity, other.certIdentity) &&
                 Objects.equals(codeSignCmd, other.codeSignCmd) &&
-                Objects.equals(codeSignDeep, other.codeSignDeep) &&
+                codeSignDeep != other.codeSignDeep &&
                 Objects.equals(keyChain, other.keyChain) &&
                 Objects.equals(javaProperties, other.javaProperties) &&
                 Objects.equals(javaExtras, other.javaExtras) &&
                 Objects.equals(bundleExtras, other.bundleExtras) &&
                 Objects.equals(arguments, other.arguments) &&
                 Objects.equals(backgroundScript, other.backgroundScript) &&
-                Objects.equals(copyDependencyJars, other.copyDependencyJars) ;
+                copyDependencyJars != other.copyDependencyJars;
     }
 
     
