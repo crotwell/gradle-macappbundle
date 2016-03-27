@@ -129,6 +129,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.inputs.property("MacAppBundlePlugin appFolderY", {project.macAppBundle.appFolderY})
         task.inputs.property("MacAppBundlePlugin backgroundImageWidth", {project.macAppBundle.backgroundImageWidth})
         task.inputs.property("MacAppBundlePlugin backgroundImageHeight", {project.macAppBundle.backgroundImageHeight})
+        task.inputs.property("MacAppBundlePlugin copyDependencyJars", {project.macAppBundle.copyDependencyJars})
         return task
     }
 
@@ -355,7 +356,9 @@ class MacAppBundlePlugin implements Plugin<Project> {
 
         distSpec.with {
             from(jar)
-            from(project.configurations.runtime)
+            if (project.macAppBundle.copyDependencyJars) {
+                from(project.configurations.runtime)
+            }
         }
 
         return distSpec

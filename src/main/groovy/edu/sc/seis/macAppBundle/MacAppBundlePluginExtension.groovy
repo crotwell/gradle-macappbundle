@@ -198,6 +198,11 @@ class MacAppBundlePluginExtension implements Serializable {
      end tell
 """
     
+    /** Whether or not to copy dependency jars (other than the jar that is produced by the 'jar' task).
+     * Defaults to true.
+     */
+    boolean copyDependencyJars = true;
+
     String getJreHome() {
         // ensure jreHome is set, finding it if needed, before running task
         if (jreHome == null && Os.isFamily(Os.FAMILY_MAC) && appStyle == 'Oracle') {
@@ -257,7 +262,8 @@ class MacAppBundlePluginExtension implements Serializable {
                 codeSignCmd,
                 codeSignDeep,
                 keyChain,
-                backgroundScript);
+                backgroundScript,
+                copyDependencyJars);
     }
 
     @Override
@@ -298,7 +304,8 @@ class MacAppBundlePluginExtension implements Serializable {
                 Objects.equals(javaExtras, other.javaExtras) &&
                 Objects.equals(bundleExtras, other.bundleExtras) &&
                 Objects.equals(arguments, other.arguments) &&
-                Objects.equals(backgroundScript, other.backgroundScript);
+                Objects.equals(backgroundScript, other.backgroundScript) &&
+                Objects.equals(copyDependencyJars, other.copyDependencyJars) ;
     }
 
     
