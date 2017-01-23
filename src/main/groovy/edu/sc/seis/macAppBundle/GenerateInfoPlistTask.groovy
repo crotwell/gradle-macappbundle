@@ -34,8 +34,6 @@ class GenerateInfoPlistTask  extends DefaultTask {
     
     def void writeInfoPlistOracleJava() {
         MacAppBundlePluginExtension extension = project.macAppBundle
-        def classpath = project.configurations.runtime.collect { "${it.name}" }
-        classpath.add(project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files.getSingleFile().name)
         def file = getPlistFile()
         file.parentFile.mkdirs()
         def writer = new BufferedWriter(new FileWriter(file))
@@ -117,8 +115,13 @@ class GenerateInfoPlistTask  extends DefaultTask {
     
     def void writeInfoPlistAppleJava() {
         MacAppBundlePluginExtension extension = project.macAppBundle
-        def classpath = project.configurations.runtime.collect { "${it.name}" }
-        classpath.add(project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files.getSingleFile().name)
+        def classpath;
+        if (extension.runtimeConfigurationName == null ) {
+            classpath = project.configurations.runtime.collect { "${it.name}" }
+            classpath.add(project.tasks[JavaPlugin.JAR_TASK_NAME].outputs.files.getSingleFile().name)
+        } else {
+            classpath = project.configurations[extension.runtimeConfigurationName].collect { "${it.name}" }
+        }
         def file = getPlistFile()
         file.parentFile.mkdirs()
         def writer = new BufferedWriter(new FileWriter(file))

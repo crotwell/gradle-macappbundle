@@ -43,6 +43,8 @@ class MacAppBundlePlugin implements Plugin<Project> {
             // this needs to happen after the extension has been populated, but
             // before any tasks run
             pluginExtension.configureDefaults(project)
+            project.getTasks().getByName("copyToResourcesJava").dependsOn(pluginExtension.jarTask)
+            project.getTasks().getByName("generatePlist").dependsOn(pluginExtension.jarTask)
         }
 
         Task plistTask = addCreateInfoPlistTask(project)
@@ -100,6 +102,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.inputs.property("MacAppBundlePlugin mainClassName", {project.macAppBundle.mainClassName})
         task.inputs.property("MacAppBundlePlugin bundleIdentifier", {project.macAppBundle.bundleIdentifier})
         task.inputs.property("MacAppBundlePlugin creatorCode", {project.macAppBundle.creatorCode})
+        task.inputs.property("MacAppBundlePlugin runtimeConfigurationName", {project.macAppBundle.runtimeConfigurationName})
         task.inputs.property("MacAppBundlePlugin icon", {project.macAppBundle.icon})
         task.inputs.property("MacAppBundlePlugin jvmVersion", {project.macAppBundle.jvmVersion})
         task.inputs.property("MacAppBundlePlugin backgroundImage", {project.macAppBundle.backgroundImage})
@@ -134,9 +137,11 @@ class MacAppBundlePlugin implements Plugin<Project> {
 
     private Task addCopyToLibTask(Project project) {
         Sync task = project.tasks.create(TASK_LIB_COPY_NAME, Sync)
-        task.description = "Copies the project dependency jars in the Contents/Resorces/Java directory."
+        task.description = "Copies the project dependency jars in the ${->project.macAppBundle.jarSubdir} directory, usually Contents/Java)."
         task.group = GROUP
-        task.with configureDistSpec(project)
+        project.afterEvaluate {
+          task.with configureDistSpec(project)
+        }
         task.into { project.file("${->project.buildDir}/${->project.macAppBundle.appOutputDir}/${->project.macAppBundle.appName}.app/Contents/${->project.macAppBundle.jarSubdir}") }
         return task
     }
@@ -351,13 +356,11 @@ class MacAppBundlePlugin implements Plugin<Project> {
 
     private CopySpec configureDistSpec(Project project) {
         CopySpec distSpec = project.copySpec {}
-        def jar = project.tasks[JavaPlugin.JAR_TASK_NAME]
-
+        def jar = project.tasks[project.macAppBundle.jarTask]
         distSpec.with {
             from(jar)
-            from(project.configurations.runtime)
+            from(project.configurations[project.macAppBundle.runtimeConfigurationName])
         }
-
         return distSpec
     }
 

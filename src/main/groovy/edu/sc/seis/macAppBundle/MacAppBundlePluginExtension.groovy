@@ -7,6 +7,7 @@ import org.apache.tools.ant.taskdefs.condition.Os;
 import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project;
+import org.gradle.api.plugins.JavaPlugin;
 
 
 class MacAppBundlePluginExtension implements Serializable {
@@ -22,6 +23,7 @@ class MacAppBundlePluginExtension implements Serializable {
         if (dmgName == null) dmgName = "${->project.name}-${->project.version}"
         if (jvmVersion == null) jvmVersion = project.targetCompatibility.toString()+"+"
         if (dmgOutputDir == null) dmgOutputDir = "${->project.distsDirName}"
+        if (jarTask == null) jarTask = JavaPlugin.JAR_TASK_NAME
         setAppStyle(appStyle)
     }
     
@@ -62,6 +64,13 @@ class MacAppBundlePluginExtension implements Serializable {
 
     /** The initial class to start the application, must contain a public static void main method. */ 
     String mainClassName
+
+    /** The configuration used to copy jars into the app. Default is runtime, which means use the runtime configuration
+        from the java plugin. */ 
+    String runtimeConfigurationName = "runtime"
+    
+    /** The task that generates the jar, defaults to JavaPlugin.JAR_TASK_NAME. */
+    String jarTask
     
     /** The CFBundleIdentifier, defaults to mainClassName. */
     String bundleIdentifier
@@ -230,6 +239,8 @@ class MacAppBundlePluginExtension implements Serializable {
         int result = 1;
         result = prime * result + ((appStyle == null) ? 0 : appStyle.hashCode());
         result = prime * result + ((creatorCode == null) ? 0 : creatorCode.hashCode());
+        result = prime * result + ((jarTask == null) ? 0 : jarTask.hashCode());
+        result = prime * result + ((runtimeConfiguration == null) ? 0 : runtimeConfigurationName.hashCode());
         result = prime * result + ((icon == null) ? 0 : icon.hashCode());
         result = prime * result + ((jvmVersion == null) ? 0 : jvmVersion.hashCode());
         result = prime * result + ((mainClassName == null) ? 0 : mainClassName.hashCode());
@@ -280,6 +291,16 @@ class MacAppBundlePluginExtension implements Serializable {
             if (other.creatorCode != null)
                 return false;
         } else if (!creatorCode.equals(other.creatorCode))
+            return false;
+        if (jarTask == null) {
+            if (other.jarTask != null)
+                return false;
+        } else if (!jarTask.equals(other.jarTask))
+            return false;
+        if (runtimeConfigurationName == null) {
+            if (other.runtimeConfigurationName != null)
+                return false;
+        } else if (!runtimeConfigurationName.equals(other.runtimeConfigurationName))
             return false;
         if (icon == null) {
             if (other.icon != null)
