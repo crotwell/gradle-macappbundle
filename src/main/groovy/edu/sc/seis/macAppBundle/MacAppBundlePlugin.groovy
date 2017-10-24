@@ -82,10 +82,12 @@ class MacAppBundlePlugin implements Plugin<Project> {
         zipTask.dependsOn(createAppTask)
         zipTask.mustRunAfter codeSignTask
         zipTask.mustRunAfter setFileTask
-        if (Os.isFamily(Os.FAMILY_MAC)) {
-            project.getTasksByName("assemble", true).each{ t -> t.dependsOn(dmgTask) }
-        } else {
-            project.getTasksByName("assemble", true).each{ t -> t.dependsOn(zipTask) }
+        project.afterEvaluate{
+          if (Os.isFamily(Os.FAMILY_MAC)) {
+              project.getTasksByName("assemble", true).each{ t -> t.dependsOn(dmgTask) }
+          } else {
+              project.getTasksByName("assemble", true).each{ t -> t.dependsOn(zipTask) }
+          }
         }
     }
 
