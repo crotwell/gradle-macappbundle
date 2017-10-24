@@ -2,7 +2,7 @@ A [Gradle](http://www.gradle.org) Plugin to create a Mac OSX .app application an
 
 Available at [plugins.gradle.org](https://plugins.gradle.org/plugin/edu.sc.seis.macAppBundle).
 
-**Version 2.1.7 released 21 July 2017.**
+**Version 2.1.8 released 24 October 2017.**
 
 Now available via the Gradle Plugin Portal. Please see:
 http://plugins.gradle.org/plugin/edu.sc.seis.macAppBundle
@@ -12,7 +12,7 @@ To add to a gradle project, add this to build.gradle and run **gradle createApp*
 For gradle 2.1 or later:
 ```
 plugins {
-  id "edu.sc.seis.macAppBundle" version "2.1.7"
+  id "edu.sc.seis.macAppBundle" version "2.1.8"
 }
 ```
 
