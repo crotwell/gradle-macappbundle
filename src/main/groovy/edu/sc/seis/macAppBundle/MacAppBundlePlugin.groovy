@@ -133,7 +133,8 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.inputs.property("MacAppBundlePlugin backgroundImageHeight", {project.macAppBundle.backgroundImageHeight})
 
         // optional inputs
-        //     code below should be changed to task.inputs.property("...", {...}).optional()
+        //     code below should be changed to 
+        //     task.inputs.property("...", {...}).optional(true)
         //     once minimal supported Gradle version is 4.3
         if(project.macAppBundle.backgroundImage) task.inputs.property("MacAppBundlePlugin backgroundImage", {project.macAppBundle.backgroundImage})
         if(project.macAppBundle.certIdentity) task.inputs.property("MacAppBundlePlugin certIdentity", {project.macAppBundle.certIdentity})
