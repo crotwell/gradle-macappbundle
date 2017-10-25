@@ -107,7 +107,6 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.inputs.property("MacAppBundlePlugin runtimeConfigurationName", {project.macAppBundle.runtimeConfigurationName})
         task.inputs.property("MacAppBundlePlugin icon", {project.macAppBundle.icon})
         task.inputs.property("MacAppBundlePlugin jvmVersion", {project.macAppBundle.jvmVersion})
-        task.inputs.property("MacAppBundlePlugin backgroundImage", {project.macAppBundle.backgroundImage})
         task.inputs.property("MacAppBundlePlugin appName", {project.macAppBundle.appName})
         task.inputs.property("MacAppBundlePlugin volumeName", {project.macAppBundle.volumeName})
         task.inputs.property("MacAppBundlePlugin dmgName", {project.macAppBundle.dmgName})
@@ -123,10 +122,8 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.inputs.property("MacAppBundlePlugin bundleDevelopmentRegion", {project.macAppBundle.bundleDevelopmentRegion})
         task.inputs.property("MacAppBundlePlugin bundleJRE", {project.macAppBundle.bundleJRE})
         task.inputs.property("MacAppBundlePlugin jreHome", {project.macAppBundle.jreHome})
-        task.inputs.property("MacAppBundlePlugin certIdentity", {project.macAppBundle.certIdentity})
         task.inputs.property("MacAppBundlePlugin codeSignCmd", {project.macAppBundle.codeSignCmd})
         task.inputs.property("MacAppBundlePlugin codeSignDeep", {project.macAppBundle.codeSignDeep})
-        task.inputs.property("MacAppBundlePlugin keyChain", {project.macAppBundle.keyChain})
         task.inputs.property("MacAppBundlePlugin backgroundScript", {project.macAppBundle.backgroundScript})
         task.inputs.property("MacAppBundlePlugin appIconX", {project.macAppBundle.appIconX})
         task.inputs.property("MacAppBundlePlugin appIconY", {project.macAppBundle.appIconY})
@@ -134,6 +131,14 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.inputs.property("MacAppBundlePlugin appFolderY", {project.macAppBundle.appFolderY})
         task.inputs.property("MacAppBundlePlugin backgroundImageWidth", {project.macAppBundle.backgroundImageWidth})
         task.inputs.property("MacAppBundlePlugin backgroundImageHeight", {project.macAppBundle.backgroundImageHeight})
+
+        // optional inputs
+        //     code below should be changed to task.inputs.property("...", {...}).optional()
+        //     once minimal supported Gradle version is 4.3
+        if(project.macAppBundle.backgroundImage) task.inputs.property("MacAppBundlePlugin backgroundImage", {project.macAppBundle.backgroundImage})
+        if(project.macAppBundle.certIdentity) task.inputs.property("MacAppBundlePlugin certIdentity", {project.macAppBundle.certIdentity})
+        if(project.macAppBundle.keyChain) task.inputs.property("MacAppBundlePlugin keyChain", {project.macAppBundle.keyChain})
+        
         return task
     }
 
