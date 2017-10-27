@@ -298,7 +298,14 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.description = "Create a dmg containing the .app and optional background image"
         task.group = GROUP
         task.inputs.dir("${->project.buildDir}/${->project.macAppBundle.appOutputDir}")
-        task.inputs.property("backgroundImage", { project.macAppBundle.backgroundImage } )
+
+        // optional inputs
+        //     code below should be changed to 
+        //     task.inputs.property("...", {...}).optional(true)
+        //     once minimal supported Gradle version is 4.3
+        // task.inputs.property("backgroundImage", { project.macAppBundle.backgroundImage } ).optional(true)
+        if(project.macAppBundle.backgroundImage) task.inputs.property("MacAppBundlePlugin backgroundImage", {project.macAppBundle.backgroundImage})
+        
         task.outputs.file("${->project.buildDir}/${->project.macAppBundle.dmgOutputDir}/${->project.macAppBundle.dmgName}.dmg")
 
         project.afterEvaluate {
