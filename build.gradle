@@ -8,10 +8,10 @@ plugins {
 }
 
 group = "edu.sc.seis"
-version = "2.1.9"
+version = "2.2.0-SNAPSHOT"
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 dependencies {
   compile gradleApi()
@@ -40,13 +40,6 @@ pluginBundle {
       }
     }
 
-//    pluginImplementationClass 'edu.sc.seis.gradle.macAppBundle.MacAppBundlePlugin'
-//    pluginLicenses 'Apache-2.0'
-//    authorId 'crotwell'
-//    authorName 'Philip Crotwell'
-//    authorEmail 'crotwell@seis.sc.edu'
-//    projectInceptionYear '2012'
-//    done() // do not omit this
 }
 
 
