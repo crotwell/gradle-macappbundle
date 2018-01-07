@@ -185,7 +185,7 @@ class MacAppBundlePluginExtension implements Serializable {
      */
     String backgroundScript = """
    tell application "Finder"
-     tell disk "\${VOL_NAME}"
+      tell disk "\${VOL_NAME}"
            open
            set current view of container window to icon view
            set toolbar visible of container window to false
@@ -198,12 +198,22 @@ class MacAppBundlePluginExtension implements Serializable {
            set background picture of viewOptions to file ".background:\${DMG_BACKGROUND_IMG}"
            set position of item "\${APP_NAME}.app" of container window to { \${APPICONX}, \${APPICONY} }
            set position of item "Applications" of container window to { \${APPFOLDERX}, \${APPFOLDERY} }
+           set position of item ".background" of container window to { 100, 5000 }
+           if exists item ".fseventsd"
+              set position of item ".fseventsd" of container window to { 120, 5000 }
+           end
+           if exists item ".DS_Store"
+              set position of item ".DS_Store" of container window to { 140, 5000 }
+           end
+           if exists item ".Trashes"
+              set position of item ".Trashes" of container window to { 160, 5000 }
+           end
            close
            open
            update without registering applications
            delay 2
-        end tell
-     end tell
+      end tell
+   end tell
 """
     
     String getJreHome() {
