@@ -415,7 +415,8 @@ class MacAppBundlePlugin implements Plugin<Project> {
         def engine = new SimpleTemplateEngine()
         def template = engine.createTemplate(backgroundScript).make(binding)
 
-//        sleep 2000
+        // This delay removes error "Finder got an error: Can’t get disk (-1728)"
+        sleep 2000
         def appleScriptCmd = "osascript".execute()
         appleScriptCmd.withWriter { writer ->
             writer << template.toString()
