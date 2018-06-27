@@ -280,15 +280,6 @@ class MacAppBundlePlugin implements Plugin<Project> {
                 task.from "${->project.macAppBundle.backgroundImage}"
                 task.into "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/.background"
             }
-            task.doLast {
-                String backgroundImage = new File(project.macAppBundle.backgroundImage).getName() // just name, not paths    
-                def imageWidth = runCmd(["sips", "-g", "pixelWidth", "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/.background/${backgroundImage}"], "Unable to determine image size with sips")
-                imageWidth = imageWidth.tokenize().last();
-                def imageHeight = runCmd(["sips", "-g", "pixelHeight", "${->project.buildDir}/${->project.macAppBundle.appOutputDir}/.background/${backgroundImage}"], "Unable to determine image size with sips")
-                imageHeight = imageHeight.tokenize().last();
-                project.macAppBundle.backgroundImageWidth = imageWidth
-                project.macAppBundle.backgroundImageHeight = imageHeight
-            }
         }
         return task
     }
@@ -341,6 +332,14 @@ class MacAppBundlePlugin implements Plugin<Project> {
             task.doLast {
                 if (project.macAppBundle.backgroundImage != null) {
                     String backgroundImage = new File(project.macAppBundle.backgroundImage).getName() // just name, not paths
+
+                    def imageWidth = runCmd(["sips", "-g", "pixelWidth", "${-> project.buildDir}/${-> project.macAppBundle.appOutputDir}/.background/${backgroundImage}"], "Unable to determine image size with sips")
+                    imageWidth = imageWidth.tokenize().last()
+                    def imageHeight = runCmd(["sips", "-g", "pixelHeight", "${-> project.buildDir}/${-> project.macAppBundle.appOutputDir}/.background/${backgroundImage}"], "Unable to determine image size with sips")
+                    imageHeight = imageHeight.tokenize().last()
+                    project.macAppBundle.backgroundImageWidth = imageWidth
+                    project.macAppBundle.backgroundImageHeight = imageHeight
+
                     doBackgroundImageAppleScript(dmgOutDir,
                                                  tmpDmgName,
                                                   "${->project.macAppBundle.dmgName}.dmg",
