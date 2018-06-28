@@ -2,13 +2,13 @@
 
 plugins {
   id 'maven-publish'
-  id 'com.gradle.plugin-publish' version '0.9.9'
+  id 'com.gradle.plugin-publish' version '0.9.10'
   id 'eclipse'
   id 'groovy'
 }
 
 group = "edu.sc.seis"
-version = "2.2.2-SNAPSHOT"
+version = "2.2.2"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
