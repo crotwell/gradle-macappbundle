@@ -303,7 +303,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
             def dmgOutDir = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}")
             GString tmpDmgName;
             String dmgFormat;
-            if (project.macAppBundle.backgroundImage != null) {
+            if (project.macAppBundle.backgroundImage != null || project.macAppBundle.createLinkToApplicationsFolder) {
                 // if we have a background image, we need to create a RW disk image so we can set it,
                 // and then convert the RW to a compressed RO image later with the final name
                 tmpDmgName = "tmp_${->project.macAppBundle.dmgName}.dmg"
@@ -330,6 +330,12 @@ class MacAppBundlePlugin implements Plugin<Project> {
                         tmpDmgName
             }
             task.doLast {
+                if (project.macAppBundle.createLinkToApplicationsFolder) {
+                    createLinkToApplicationsFolder(dmgOutDir,
+                            tmpDmgName,
+                            "${-> project.macAppBundle.volumeName}")
+                }
+
                 if (project.macAppBundle.backgroundImage != null) {
                     String backgroundImage = new File(project.macAppBundle.backgroundImage).getName() // just name, not paths
 
@@ -342,7 +348,6 @@ class MacAppBundlePlugin implements Plugin<Project> {
 
                     doBackgroundImageAppleScript(dmgOutDir,
                                                  tmpDmgName,
-                                                  "${->project.macAppBundle.dmgName}.dmg",
                                                    "${->project.macAppBundle.volumeName}",
                                                     backgroundImage,
                                                     "${->project.macAppBundle.appName}",
@@ -353,6 +358,11 @@ class MacAppBundlePlugin implements Plugin<Project> {
                                                     "${->project.macAppBundle.appIconY}",
                                                     "${->project.macAppBundle.appFolderX}",
                                                     "${->project.macAppBundle.appFolderY}")
+                }
+
+                if (dmgFormat == "UDRW") {
+                    runCmd(["hdiutil", "convert", "${dmgOutDir}/${tmpDmgName}", "-format", "UDZO", "-imagekey", "zlib-level=9", "-o", "${dmgOutDir}/${-> project.macAppBundle.dmgName}.dmg"], "Unable to convert dmg image")
+                    new File("${dmgOutDir}/${tmpDmgName}").delete()
                 }
             }
             task.doFirst { task.outputs.files.each { it.delete() } }
@@ -378,13 +388,30 @@ class MacAppBundlePlugin implements Plugin<Project> {
         return distSpec
     }
 
+    private void createLinkToApplicationsFolder(File dmgOutDir,
+                                                String tmpDmgFile,
+                                                String volMountPoint) {
+        if (new File("/Volumes/${volMountPoint}").exists()) {
+            // if volume already mounted, maybe due to previous build, unmount
+            runCmd(["hdiutil", "detach", "/Volumes/${volMountPoint}"], "Unable to detach volume: ${volMountPoint}")
+        }
 
-    /** see 
+        // mount temp dmg
+        String mountCmdOut = runCmd(["hdiutil", "attach", "-readwrite", "-noverify", "${dmgOutDir}/${tmpDmgFile}"], "Unable to mount dmg")
+        if (!new File("/Volumes/${volMountPoint}").exists()) {
+            throw new RuntimeException("Unable to find volume mount point to set background image. ${volMountPoint}")
+        }
+
+        runCmd(["ln", "-s", "/Applications", "/Volumes/${volMountPoint}"], "Unable to link /Applications in dmg")
+
+        runCmd(["hdiutil", "detach", "/Volumes/${volMountPoint}"], "Unable to detach volume: ${volMountPoint}")
+    }
+
+    /** see
      http://asmaloney.com/2013/07/howto/packaging-a-mac-os-x-application-using-a-dmg/
      */
     private void doBackgroundImageAppleScript(File dmgOutDir,
                                               String tmpDmgFile,
-                                              String finalDmgFile,
                                               String volMountPoint,
                                               String backgroundImage,
                                               String appName,
@@ -404,13 +431,15 @@ class MacAppBundlePlugin implements Plugin<Project> {
             throw new RuntimeException("Unable to find volume mount point to set background image. ${volMountPoint}")
         }
 
-        runCmd(["ln", "-s", "/Applications", "/Volumes/${volMountPoint}"], "Unable to link /Applications in dmg");
-        
-        def binding = ["APP_NAME":appName, "VOL_NAME":volMountPoint, "DMG_BACKGROUND_IMG":backgroundImage,
-            "IMAGE_WIDTH":imageWidth,
-            "IMAGE_HEIGHT":imageHeight,
-            "APPICONX":appIconX, "APPICONY":appIconY,
-            "APPFOLDERX":appFolderX, "APPFOLDERY":appFolderY ]
+        def binding = ["APP_NAME"          : appName,
+                       "VOL_NAME"          : volMountPoint,
+                       "DMG_BACKGROUND_IMG": backgroundImage,
+                       "IMAGE_WIDTH"       : imageWidth,
+                       "IMAGE_HEIGHT"      : imageHeight,
+                       "APPICONX"          : appIconX,
+                       "APPICONY"          : appIconY,
+                       "APPFOLDERX"        : appFolderX,
+                       "APPFOLDERY"        : appFolderY]
         def engine = new SimpleTemplateEngine()
         def template = engine.createTemplate(backgroundScript).make(binding)
 
@@ -420,14 +449,12 @@ class MacAppBundlePlugin implements Plugin<Project> {
         appleScriptCmd.withWriter { writer ->
             writer << template.toString()
         }
-        appleScriptCmd.waitFor();
-        def retCode = appleScriptCmd.exitValue();
+        appleScriptCmd.waitFor()
+        def retCode = appleScriptCmd.exitValue()
         if (retCode != 0) {
             throw new RuntimeException("Problem running applescript to set dmg background image: "+retCode+" "+appleScriptCmd.err.text);
         }
         runCmd(["hdiutil", "detach", "/Volumes/${volMountPoint}"], "Unable to detach volume: ${volMountPoint}")
-        runCmd(["hdiutil", "convert", "${dmgOutDir}/${tmpDmgFile}", "-format", "UDZO", "-imagekey", "zlib-level=9", "-o", "${dmgOutDir}/${finalDmgFile}"], "Unable to convert dmg image")
-        new File("${dmgOutDir}/${tmpDmgFile}").delete()
     }
 
     private String runCmd(List cmd, String errMsg) {
