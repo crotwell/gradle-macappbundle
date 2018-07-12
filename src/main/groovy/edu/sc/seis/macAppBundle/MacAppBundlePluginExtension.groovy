@@ -26,7 +26,7 @@ class MacAppBundlePluginExtension implements Serializable {
         if (jarTask == null) jarTask = JavaPlugin.JAR_TASK_NAME
         setAppStyle(appStyle)
     }
-    
+
     /** The style of .app created. Use 'Apple' for the original Apple Java in OSX 10.8 and earlier. Starting in
     OSX 10.9 there can be either Apple Java (1.6) or Oracle Java (1.7) and the internals of the Info.plist and
     the executable stub are different. Setting this will also change the 
@@ -174,6 +174,8 @@ class MacAppBundlePluginExtension implements Serializable {
     
     String appIconX = "160", appIconY = "205";
     String appFolderX = "360", appFolderY = "205";
+
+    boolean createLinkToApplicationsFolder = true;
     
     // will be set by using sips when copying image to .background folder
     String backgroundImageWidth = "100";
@@ -197,7 +199,9 @@ class MacAppBundlePluginExtension implements Serializable {
            set icon size of viewOptions to 72
            set background picture of viewOptions to file ".background:\${DMG_BACKGROUND_IMG}"
            set position of item "\${APP_NAME}.app" of container window to { \${APPICONX}, \${APPICONY} }
-           set position of item "Applications" of container window to { \${APPFOLDERX}, \${APPFOLDERY} }
+           if exists item "Applications"
+              set position of item "Applications" of container window to { \${APPFOLDERX}, \${APPFOLDERY} }
+           end
            set position of item ".background" of container window to { 100, 5000 }
            if exists item ".fseventsd"
               set position of item ".fseventsd" of container window to { 120, 5000 }
