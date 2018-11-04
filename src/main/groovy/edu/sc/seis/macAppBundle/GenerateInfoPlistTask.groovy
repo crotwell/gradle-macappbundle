@@ -25,7 +25,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
 
     @TaskAction
     def void writeInfoPlist() {
-        if (project.macAppBundle.appStyle == 'Oracle') {
+        if (project.macAppBundle.appStyle == 'Oracle' || project.macAppBundle.appStyle == 'universalJavaApplicationStub') {
             writeInfoPlistOracleJava();
         } else {
             writeInfoPlistAppleJava();
