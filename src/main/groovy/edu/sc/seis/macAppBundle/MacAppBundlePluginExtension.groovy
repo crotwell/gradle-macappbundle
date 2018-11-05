@@ -31,12 +31,14 @@ class MacAppBundlePluginExtension implements Serializable {
     OSX 10.9 there can be either Apple Java (1.6) or Oracle Java (1.7) and the internals of the Info.plist and
     the executable stub are different. Setting this will also change the 
     bundleExecutable and the jarSubdir as both of these are different in Oracle versus Apple styles.
-    The default is 'universalJavaApplicationStub'.
-    
+    The default is 'Oracle'.
+
     More information on the new Oracle style .app can be found <a href="https://java.net/projects/appbundler">here</a>.
+
+    Test your application before switching to universalJavaApplicationStub as it may not be compatible with certain features
     More information on the universalJavaApplicationStub can be found <a href="https://github.com/tofi86/universalJavaApplicationStub">here</a>.
     */
-    String appStyle = 'universalJavaApplicationStub'
+    String appStyle = 'Oracle'
     
     def setAppStyle(String val) {
         appStyle = val
@@ -48,9 +50,9 @@ class MacAppBundlePluginExtension implements Serializable {
             jarSubdir = 'Resources/Java'
         } else if (val == "universalJavaApplicationStub") {
             bundleExecutable = 'universalJavaApplicationStub'
-            jarSubdir = 'Resources/Java'
+            jarSubdir = 'Java'
         } else {
-            throw new InvalidUserDataException("I don't understand appStyle='${appStyle}', should be one of 'universalJavaApplicationStub', 'Apple' or 'Oracle'")
+            throw new InvalidUserDataException("I don't understand appStyle='${appStyle}', should be one of 'Oracle', 'universalJavaApplicationStub' or 'Apple'")
         }
     }
     
@@ -125,9 +127,9 @@ class MacAppBundlePluginExtension implements Serializable {
     String jarSubdir = 'Java'
     
     /** The name of the executable run by the bundle.
-     * Default is 'universalJavaApplicationStub'. This is also set when setting the style to Oracle or Apple.
+     * Default is 'JavaAppLauncher'. This is also set when setting the style to Oracle, universalJavaApplicationStub, or Apple.
      */
-    String bundleExecutable = 'universalJavaApplicationStub'
+    String bundleExecutable = 'JavaAppLauncher'
     
     /** BundleAllowMixedLocalizations, default is true */
     boolean bundleAllowMixedLocalizations = true
