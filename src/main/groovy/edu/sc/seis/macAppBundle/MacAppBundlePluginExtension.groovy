@@ -32,8 +32,11 @@ class MacAppBundlePluginExtension implements Serializable {
     the executable stub are different. Setting this will also change the 
     bundleExecutable and the jarSubdir as both of these are different in Oracle versus Apple styles.
     The default is 'Oracle'.
-    
+
     More information on the new Oracle style .app can be found <a href="https://java.net/projects/appbundler">here</a>.
+
+    Test your application before switching to universalJavaApplicationStub as it may not be compatible with certain features
+    More information on the universalJavaApplicationStub can be found <a href="https://github.com/tofi86/universalJavaApplicationStub">here</a>.
     */
     String appStyle = 'Oracle'
     
@@ -45,8 +48,11 @@ class MacAppBundlePluginExtension implements Serializable {
         } else if (val == 'Apple') {
             bundleExecutable = 'JavaApplicationStub'
             jarSubdir = 'Resources/Java'
+        } else if (val == "universalJavaApplicationStub") {
+            bundleExecutable = 'universalJavaApplicationStub'
+            jarSubdir = 'Java'
         } else {
-            throw new InvalidUserDataException("I don't understand appStyle='${appStyle}', should be one of 'Apple' or 'Oracle'")
+            throw new InvalidUserDataException("I don't understand appStyle='${appStyle}', should be one of 'Oracle', 'universalJavaApplicationStub' or 'Apple'")
         }
     }
     
@@ -121,7 +127,7 @@ class MacAppBundlePluginExtension implements Serializable {
     String jarSubdir = 'Java'
     
     /** The name of the executable run by the bundle.
-     * Default is 'JavaAppLauncher'. This is also set when setting the style to Oracle or Apple.
+     * Default is 'JavaAppLauncher'. This is also set when setting the style to Oracle, universalJavaApplicationStub, or Apple.
      */
     String bundleExecutable = 'JavaAppLauncher'
     
@@ -222,7 +228,7 @@ class MacAppBundlePluginExtension implements Serializable {
     
     String getJreHome() {
         // ensure jreHome is set, finding it if needed, before running task
-        if (jreHome == null && Os.isFamily(Os.FAMILY_MAC) && appStyle == 'Oracle') {
+        if (jreHome == null && Os.isFamily(Os.FAMILY_MAC) && (appStyle == 'Oracle' || appStyle == 'universalJavaApplicationStub')) {
             String javaHomeCommand = """/usr/libexec/java_home"""// Create the String
             File jhFile = new File((String)javaHomeCommand);
             if ( ! jhFile.exists()) {
