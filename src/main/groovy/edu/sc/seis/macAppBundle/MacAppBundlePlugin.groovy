@@ -121,7 +121,6 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.inputs.property("MacAppBundlePlugin bundleInfoDictionaryVersion", {project.macAppBundle.bundleInfoDictionaryVersion})
         task.inputs.property("MacAppBundlePlugin bundleDevelopmentRegion", {project.macAppBundle.bundleDevelopmentRegion})
         task.inputs.property("MacAppBundlePlugin bundleJRE", {project.macAppBundle.bundleJRE})
-        task.inputs.property("MacAppBundlePlugin jreHome", {project.macAppBundle.jreHome})
         task.inputs.property("MacAppBundlePlugin codeSignCmd", {project.macAppBundle.codeSignCmd})
         task.inputs.property("MacAppBundlePlugin codeSignDeep", {project.macAppBundle.codeSignDeep})
         task.inputs.property("MacAppBundlePlugin backgroundScript", {project.macAppBundle.backgroundScript})
@@ -139,6 +138,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         if(project.macAppBundle.backgroundImage) task.inputs.property("MacAppBundlePlugin backgroundImage", {project.macAppBundle.backgroundImage})
         if(project.macAppBundle.certIdentity) task.inputs.property("MacAppBundlePlugin certIdentity", {project.macAppBundle.certIdentity})
         if(project.macAppBundle.keyChain) task.inputs.property("MacAppBundlePlugin keyChain", {project.macAppBundle.keyChain})
+        if(project.macAppBundle.jreHome) task.inputs.property("MacAppBundlePlugin jreHome", {project.macAppBundle.jreHome})
         
         return task
     }

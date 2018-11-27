@@ -158,13 +158,13 @@ class MacAppBundlePluginExtension implements Serializable {
     with the appbundler utility from Oracle, this is usually the Contents/Home
     subdirectory of the JDK install.
     
-    If bundleJRE is true, but jreHome is null, it will be set to the output of
+    If bundleJRE is true, but jreHome is empty, it will be set to the output of
     /usr/libexec/java_home, which should be correct in most cases.
     
     For example:
     /Library/Java/JavaVirtualMachines/jdk1.7.0_51.jdk/Contents/Home
     */
-    String jreHome
+    String jreHome = ""
     
     /** for codesign */
     String certIdentity = null
@@ -228,7 +228,7 @@ class MacAppBundlePluginExtension implements Serializable {
     
     String getJreHome() {
         // ensure jreHome is set, finding it if needed, before running task
-        if (jreHome == null && Os.isFamily(Os.FAMILY_MAC) && (appStyle == 'Oracle' || appStyle == 'universalJavaApplicationStub')) {
+        if ((jreHome == null || jreHome.length() == 0) && Os.isFamily(Os.FAMILY_MAC) && (appStyle == 'Oracle' || appStyle == 'universalJavaApplicationStub')) {
             String javaHomeCommand = """/usr/libexec/java_home"""// Create the String
             File jhFile = new File((String)javaHomeCommand);
             if ( ! jhFile.exists()) {

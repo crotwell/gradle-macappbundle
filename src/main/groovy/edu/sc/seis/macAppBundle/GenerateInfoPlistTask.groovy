@@ -70,7 +70,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 key('CFBundleSignature')
                 string(extension.creatorCode)
                 if (extension.bundleJRE) {
-                    if (extension.getJreHome() != null) {
+                    if (extension.getJreHome() != null && extension.getJreHome().length() != 0) {
                         File jreHomeFile = new File(extension.getJreHome());
                         if (jreHomeFile.exists()) {
                             def jreVersion = jreHomeFile.getParentFile().getParentFile().getName()
