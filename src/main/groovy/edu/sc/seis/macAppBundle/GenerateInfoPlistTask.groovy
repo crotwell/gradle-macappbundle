@@ -66,7 +66,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 key('CFBundleAllowMixedLocalizations')
                 if (extension.bundleAllowMixedLocalizations) { xml.true() } else { xml.false() }
                 key('NSHighResolutionCapable')
-                if (extension.highResolutionCapable) { string('true') } else { string('false') }
+                if (extension.highResolutionCapable) { xml.true() } else { xml.false() }
                 key('CFBundleSignature')
                 string(extension.creatorCode)
                 if (extension.bundleJRE) {
@@ -141,7 +141,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 key('CFBundleAllowMixedLocalizations')
                 if (extension.bundleAllowMixedLocalizations) { xml.true() } else { xml.false() }
                 key('NSHighResolutionCapable')
-                if (extension.highResolutionCapable) { string('true') } else { string('false') }
+                if (extension.highResolutionCapable) { xml.true() } else { xml.false() }
                 key('CFBundleExecutable')
                 string(extension.bundleExecutable)
                 key('CFBundleDevelopmentRegion')
