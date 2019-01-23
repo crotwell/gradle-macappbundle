@@ -64,7 +64,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 key('CFBundleShortVersionString')
                 string(project.version)
                 key('CFBundleAllowMixedLocalizations')
-                if (extension.bundleAllowMixedLocalizations) { string('true') } else { string('false') }
+                if (extension.bundleAllowMixedLocalizations) { xml.true() } else { xml.false() }
                 key('NSHighResolutionCapable')
                 if (extension.highResolutionCapable) { string('true') } else { string('false') }
                 key('CFBundleSignature')
@@ -139,7 +139,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 key('CFBundleVersion')
                 string(project.version)
                 key('CFBundleAllowMixedLocalizations')
-                if (extension.bundleAllowMixedLocalizations) { string('true') } else { string('false') }
+                if (extension.bundleAllowMixedLocalizations) { xml.true() } else { xml.false() }
                 key('NSHighResolutionCapable')
                 if (extension.highResolutionCapable) { string('true') } else { string('false') }
                 key('CFBundleExecutable')
