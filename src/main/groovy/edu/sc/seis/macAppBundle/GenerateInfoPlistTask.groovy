@@ -31,7 +31,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
             writeInfoPlistAppleJava();
         }
     }
-    
+
     def void writeInfoPlistOracleJava() {
         MacAppBundlePluginExtension extension = project.macAppBundle
         def file = getPlistFile()
@@ -51,14 +51,14 @@ class GenerateInfoPlistTask  extends DefaultTask {
                 string(project.file(extension.icon).name)
                 key('CFBundleIdentifier')
                 string(extension.bundleIdentifier)
-                
+
                 key('CFBundleInfoDictionaryVersion')
                 string(extension.bundleInfoDictionaryVersion)
                 key('CFBundleName')
                 string(extension.appName)
                 key('CFBundlePackageType')
                 string(extension.bundlePackageType)
-                
+
                 key('CFBundleVersion')
                 string(project.version)
                 key('CFBundleShortVersionString')
@@ -112,7 +112,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
         }
         writer.close()
     }
-    
+
     def void writeInfoPlistAppleJava() {
         MacAppBundlePluginExtension extension = project.macAppBundle
         def classpath;
@@ -189,7 +189,7 @@ class GenerateInfoPlistTask  extends DefaultTask {
         } else if (value instanceof Date)  {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
             xml.date(sdf.format(value));
-            //YYYY-MM-DD HH:MM:SS 
+            //YYYY-MM-DD HH:MM:SS
         } else if (value instanceof Short || value instanceof Integer)  {
             xml.integer(value)
         } else if (value instanceof Float || value instanceof Double)  {
