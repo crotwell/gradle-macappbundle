@@ -2,7 +2,7 @@ A [Gradle](http://www.gradle.org) Plugin to create a Mac OSX .app application an
 
 ***Note I am no longer able to actively develop this project.***
 
-I will consider pull requests, but I believe that the Java world has changed significantly over the past several years, and this plugin may not longer be the recommended way to package a Java app for OSX.
+I will consider pull requests, but I believe that the Java world has changed significantly over the past several years, and this plugin may no longer be the recommended way to package a Java app for OSX.
 
 Available at [plugins.gradle.org](https://plugins.gradle.org/plugin/edu.sc.seis.macAppBundle).
 
