@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "edu.sc.seis"
-version = "2.4.0"
+version = "2.3.1-SNAPSHOT"
 
 sourceCompatibility = 11
 targetCompatibility = 11
@@ -18,6 +18,10 @@ dependencies {
   implementation gradleApi()
   implementation localGroovy() //not needed for Java plugins
   // other dependencies that your plugin requires
+}
+
+rootProject.tasks.named("processResources") {
+    duplicatesStrategy = 'include'
 }
 
 publishing {
@@ -32,8 +36,6 @@ pluginBundle {
     website = 'https://github.com/crotwell/gradle-macappbundle'
     vcsUrl = 'https://github.com/crotwell/gradle-macappbundle.git'
     tags = [ 'gradle', 'plugin', 'macappbundle', 'dmg', 'osx']
-
-
 }
 
 gradlePlugin {
