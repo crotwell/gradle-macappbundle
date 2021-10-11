@@ -71,9 +71,8 @@ class MacAppBundlePluginExtension implements Serializable {
     /** The initial class to start the application, must contain a public static void main method. */ 
     String mainClassName
 
-    /** The configuration used to copy jars into the app. Default is runtime, which means use the runtime configuration
-        from the java plugin. */ 
-    String runtimeConfigurationName = "runtime"
+    /** The configuration used to copy jars into the app. The 'runtime' was removed, so now use 'default' */ 
+    String runtimeConfigurationName = "default"
     
     /** The task that generates the jar, defaults to JavaPlugin.JAR_TASK_NAME. */
     String jarTask
