@@ -2,21 +2,21 @@
 
 plugins {
   id 'maven-publish'
-  id 'com.gradle.plugin-publish' version '0.10.0'
+  id 'com.gradle.plugin-publish' version "0.16.0"
   id 'java-gradle-plugin'
   id 'eclipse'
   id 'groovy'
 }
 
 group = "edu.sc.seis"
-version = "2.3.0"
+version = "2.4.0"
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+sourceCompatibility = 11
+targetCompatibility = 11
 
 dependencies {
-  compile gradleApi()
-  compile localGroovy() //not needed for Java plugins
+  implementation gradleApi()
+  implementation localGroovy() //not needed for Java plugins
   // other dependencies that your plugin requires
 }
 
@@ -46,5 +46,3 @@ gradlePlugin {
       }
     }
 }
-
-
