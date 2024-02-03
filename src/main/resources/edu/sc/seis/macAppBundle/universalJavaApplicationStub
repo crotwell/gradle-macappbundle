@@ -56,7 +56,7 @@
 ################################################################################
 function stub_logger() {
   # Debug logging, as that that syslog below is unreliable for me
-  echo "$1" >> /tmp/logs_pls
+  #echo "$1" >> /tmp/logs_pls
 
   syslog -s -k \
     Facility com.apple.console \
