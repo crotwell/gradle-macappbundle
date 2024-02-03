@@ -11,8 +11,10 @@ plugins {
 group = "edu.sc.seis"
 version = "2.3.1"
 
-//sourceCompatibility = 20
-//targetCompatibility = 20
+java {
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+}
 
 dependencies {
   implementation gradleApi()
