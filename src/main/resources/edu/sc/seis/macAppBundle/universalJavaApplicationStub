@@ -193,6 +193,7 @@ if [ $exitcode -eq 0 ]; then
 	# read the JVM Properties as an array and retain spaces
 	IFS=$'\t\n'
 	JVMOptions=($(xargs -n1 <<<$(plist_get_java ':Properties' | grep " =" | sed 's/^ */-D/g' | sed -E 's/ = (.*)$/="\1"/g')))
+	# /'
 	unset IFS
 	# post processing of the array follows further below...
 
@@ -515,7 +516,7 @@ if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
 		# display error message with AppleScript
 		osascript -e "tell application \"System Events\" to display dialog \"${MSG_ERROR_LAUNCHING}\n\n${MSG_JVMVERSION_REQ_INVALID_EXPANDED}\" with title \"${CFBundleName}\" buttons {\" OK \"} default button 1 with icon path to resource \"${CFBundleIconFile}\" in bundle (path to me)"
 		# exit with error
-		exit 4
+##		exit 4
 	fi
 	# then check whether JVMMaxVersion string is a valid requirement string
 	if [ ! -z "${JVMMaxVersion}" ] && ! is_valid_requirement_pattern ${JVMMaxVersion} ; then
@@ -525,7 +526,7 @@ if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
 		# display error message with AppleScript
 		osascript -e "tell application \"System Events\" to display dialog \"${MSG_ERROR_LAUNCHING}\n\n${MSG_JVMVERSION_REQ_INVALID_EXPANDED}\" with title \"${CFBundleName}\" buttons {\" OK \"} default button 1 with icon path to resource \"${CFBundleIconFile}\" in bundle (path to me)"
 		# exit with error
-		exit 5
+##		exit 5
 	fi
 
 
@@ -704,7 +705,7 @@ if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
 				-e "set response to button returned of the result" \
 				-e "if response is \"${MSG_VISIT_JAVA_DOT_COM}\" then open location \"http://java.com\""
 		# exit with error
-		exit 3
+##		exit 3
 
 	else
 		# log exit cause
@@ -714,7 +715,7 @@ if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
 					-e "set response to button returned of the result" \
 					-e "if response is \"${MSG_VISIT_JAVA_DOT_COM}\" then open location \"http://java.com\""
 		# exit with error
-		exit 1
+##		exit 1
 	fi
 fi
 
@@ -729,7 +730,7 @@ if [ -z "${JVMMainClass}" ]; then
 	# display error message with AppleScript
 	osascript -e "tell application \"System Events\" to display dialog \"${MSG_ERROR_LAUNCHING}\n\n${MSG_MISSING_MAINCLASS}\" with title \"${CFBundleName}\" buttons {\" OK \"} default button 1 with icon path to resource \"${CFBundleIconFile}\" in bundle (path to me)"
 	# exit with error
-	exit 2
+##	exit 2
 fi
 
 
@@ -750,6 +751,8 @@ fi
 # change to Working Directory based upon Apple/Oracle Plist info
 cd "${WorkingDirectory}" || exit 13
 stub_logger "[WorkingDirectory] ${WorkingDirectory}"
+
+JAVACMD="`/usr/libexec/java_home`/bin/java"
 
 # execute Java and set
 # - classpath
