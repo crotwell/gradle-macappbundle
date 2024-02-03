@@ -1,4 +1,9 @@
 #!/bin/bash
+#
+# Version adjusted to work on macOS Ventura+.
+# https://github.com/pskowronek/gradle-macappbundle
+# forked from unmaintained: https://github.com/crotwell/gradle-macappbundle
+#
 ##################################################################################
 #                                                                                #
 # universalJavaApplicationStub                                                   #
@@ -50,11 +55,16 @@
 # @return  void
 ################################################################################
 function stub_logger() {
+  # Debug logging, as that that syslog below is unreliable for me
+  echo "$1" >> /tmp/logs_pls
+
   syslog -s -k \
     Facility com.apple.console \
-    Level Notice \
+    Level Error \
     Sender "$(basename "$0")" \
-    Message "[$$][${CFBundleName:-$(basename "$0")}] $1"
+    # when CFBundleName is present it stops logging
+    #Message "[$$][${CFBundleName:-$(basename "$0")}] $1"
+    Message "[$$][$(basename "$0")] $1"
 }
 
 
@@ -75,8 +85,6 @@ while [ -h "$PRG" ]; do
 done
 PROGDIR=$(dirname "$PRG")
 stub_logger "[StubDir] $PROGDIR"
-
-
 
 # set files and folders
 ############################################
@@ -109,7 +117,6 @@ JVMVersion=""
 JVMMaxVersion=""
 
 
-
 # function 'plist_get()'
 #
 # read a specific Plist key with 'PlistBuddy' utility
@@ -133,8 +140,6 @@ plist_get_java(){
   plist_get ${JavaKey:-":Java"}$1
 }
 
-
-
 # read Info.plist and extract JVM options
 ############################################
 
@@ -143,7 +148,6 @@ CFBundleName=$(plist_get ':CFBundleName')
 
 # read the icon file name
 CFBundleIconFile=$(plist_get ':CFBundleIconFile')
-
 
 # check Info.plist for Apple style Java keys -> if key :Java is present, parse in apple mode
 /usr/libexec/PlistBuddy -c "print :Java" "${InfoPlistFile}" > /dev/null 2>&1
@@ -156,7 +160,6 @@ if [ $exitcode -ne 0 ]; then
   exitcode=$?
   JavaKey=":JavaX"
 fi
-
 
 # read 'Info.plist' file in Apple style if exit code returns 0 (true, ':Java' key is present)
 if [ $exitcode -eq 0 ]; then
@@ -298,14 +301,14 @@ fi
 stub_logger "[JavaRequirement] JVM minimum version: ${JVMVersion}"
 stub_logger "[JavaRequirement] JVM maximum version: ${JVMMaxVersion}"
 
-# MainArgs: replace occurences of $APP_ROOT with its content
+# MainArgs: replace occurrences of $APP_ROOT with its content
 MainArgsArr=()
 for i in "${MainArgs[@]}"
 do
   MainArgsArr+=("$(eval echo "$i")")
 done
 
-# JVMOptions: replace occurences of $APP_ROOT with its content
+# JVMOptions: replace occurrences of $APP_ROOT with its content
 JVMOptionsArr=()
 for i in "${JVMOptions[@]}"
 do
@@ -496,7 +499,7 @@ if [ -n "$JAVA_HOME" ] ; then
   fi
   JAVACMD_version=$(get_comparable_java_version $(get_java_version_from_cmd "${JAVACMD}"))
 else
-  stub_logger "[JavaSearch] ... didn't found JAVA_HOME"
+  stub_logger "[JavaSearch] ... didn't find JAVA_HOME"
 fi
 
 
@@ -516,7 +519,7 @@ if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
     # display error message with AppleScript
     osascript -e "tell application \"System Events\" to display dialog \"${MSG_ERROR_LAUNCHING}\n\n${MSG_JVMVERSION_REQ_INVALID_EXPANDED}\" with title \"${CFBundleName}\" buttons {\" OK \"} default button 1 with icon path to resource \"${CFBundleIconFile}\" in bundle (path to me)"
     # exit with error
-##		exit 4
+    exit 4
   fi
   # then check whether JVMMaxVersion string is a valid requirement string
   if [ ! -z "${JVMMaxVersion}" ] && ! is_valid_requirement_pattern ${JVMMaxVersion} ; then
@@ -526,16 +529,25 @@ if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
     # display error message with AppleScript
     osascript -e "tell application \"System Events\" to display dialog \"${MSG_ERROR_LAUNCHING}\n\n${MSG_JVMVERSION_REQ_INVALID_EXPANDED}\" with title \"${CFBundleName}\" buttons {\" OK \"} default button 1 with icon path to resource \"${CFBundleIconFile}\" in bundle (path to me)"
     # exit with error
-##		exit 5
+    exit 5
   fi
-
 
   # find installed JavaVirtualMachines (JDK + JRE)
   allJVMs=()
+
+  macosVerMajor=$(sw_vers --productVersion | awk -F $'.' '{print $1;}')
+  stub_logger "[JavaSearch] macOS major version: ${macosVerMajor}"
+
   # read JDK's from '/usr/libexec/java_home -V' command
+  # PSko: The output from -X (xml plist) would be probably better and more reliable
   while read -r line; do
-    version=$(echo $line | awk -F $',' '{print $1;}')
-    path=$(echo $line | awk -F $'" ' '{print $2;}')
+    if [ "${macosVerMajor}" -ge 13 ] ; then # macOS Ventura+
+      version=$(echo $line | awk -F $' ' '{print $1;}')
+      path=$(echo $line | awk -F $'" ' '{print $3;}')
+    else                                    # pre-Ventura (probably a different output was then)
+      version=$(echo $line | awk -F $',' '{print $1;}')
+      path=$(echo $line | awk -F $'" ' '{print $2;}')
+    fi
     path+="/bin/java"
     allJVMs+=("$version:$path")
   done < <(/usr/libexec/java_home -V 2>&1 | grep '^[[:space:]]')
@@ -666,8 +678,11 @@ if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
     # [2] JVM path
     path="${arr[2]}"
 
+    stub_logger "[JavaSort] Checking Java path: '$path', version: '$comp'"
+
     # use current value as JAVACMD if it's executable
     if [ -x "$path" ] ; then
+      stub_logger "[JavaSort] Going to use Java @ path: '$path', version: '$comp' (is present and executable)"
       JAVACMD="$path"
       JAVACMD_version=$comp
       break
@@ -680,7 +695,6 @@ fi
 # log the Java Command and the extracted version number
 stub_logger "[JavaCommand] '$JAVACMD'"
 stub_logger "[JavaVersion] $(get_java_version_from_cmd "${JAVACMD}")${JAVACMD_version:+ / $JAVACMD_version}"
-
 
 
 if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
@@ -705,7 +719,7 @@ if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
         -e "set response to button returned of the result" \
         -e "if response is \"${MSG_VISIT_JAVA_DOT_COM}\" then open location \"http://java.com\""
     # exit with error
-##		exit 3
+    exit 3
 
   else
     # log exit cause
@@ -715,7 +729,7 @@ if [ -z "${JAVACMD}" ] || [ ! -x "${JAVACMD}" ] ; then
           -e "set response to button returned of the result" \
           -e "if response is \"${MSG_VISIT_JAVA_DOT_COM}\" then open location \"http://java.com\""
     # exit with error
-##		exit 1
+    exit 1
   fi
 fi
 
@@ -730,12 +744,12 @@ if [ -z "${JVMMainClass}" ]; then
   # display error message with AppleScript
   osascript -e "tell application \"System Events\" to display dialog \"${MSG_ERROR_LAUNCHING}\n\n${MSG_MISSING_MAINCLASS}\" with title \"${CFBundleName}\" buttons {\" OK \"} default button 1 with icon path to resource \"${CFBundleIconFile}\" in bundle (path to me)"
   # exit with error
-##	exit 2
+  exit 2
 fi
 
 
 
-# execute $JAVACMD and do some preparation
+# execute $JAVACMD and do some preparations
 ############################################
 
 # enable drag&drop to the dock icon
@@ -752,8 +766,6 @@ fi
 cd "${WorkingDirectory}" || exit 13
 stub_logger "[WorkingDirectory] ${WorkingDirectory}"
 
-JAVACMD="`/usr/libexec/java_home`/bin/java"
-
 # execute Java and set
 # - classpath
 # - splash image
@@ -763,7 +775,7 @@ JAVACMD="`/usr/libexec/java_home`/bin/java"
 # - JVM default options (-X)
 # - main class
 # - main class arguments
-# - passthrough arguments from Terminal or Drag'n'Drop to Finder icon
+# - pass-through arguments from Terminal or Drag'n'Drop to Finder icon
 stub_logger "[Exec] \"$JAVACMD\" -cp \"${JVMClassPath}\" -splash:\"${ResourcesFolder}/${JVMSplashFile}\" -Xdock:icon=\"${ResourcesFolder}/${CFBundleIconFile}\" -Xdock:name=\"${CFBundleName}\" ${JVMOptionsArr:+$(printf "'%s' " "${JVMOptionsArr[@]}") }${JVMDefaultOptions:+$JVMDefaultOptions }${JVMMainClass}${MainArgsArr:+ $(printf "'%s' " "${MainArgsArr[@]}")}${ArgsPassthru:+ $(printf "'%s' " "${ArgsPassthru[@]}")}"
 exec "${JAVACMD}" \
     -cp "${JVMClassPath}" \

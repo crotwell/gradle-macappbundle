@@ -20,7 +20,6 @@ class MacAppBundlePlugin implements Plugin<Project> {
     static final String PLUGIN_NAME = "macAppBundle"
     static final String GROUP = PLUGIN_NAME
 
-    static final String TASK_CONFIGURE_NAME = "configMacApp"
     static final String TASK_INFO_PLIST_GENERATE_NAME = "generatePlist"
     static final String TASK_PKG_INFO_GENERATE_NAME = "generatePkgInfo"
 
