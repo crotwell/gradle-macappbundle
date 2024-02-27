@@ -44,7 +44,7 @@ gradlePlugin {
         displayName = 'MacApp Bundle plugin'
         description = 'A Gradle Plugin to create a Mac OSX .app application based on the project. '
         implementationClass = 'edu.sc.seis.macAppBundle.MacAppBundlePlugin'
-        tags.set([ 'gradle', 'plugin', 'macappbundle', 'dmg', 'osx'])
+        tags.set([ 'macappbundle', 'dmg', 'osx'])
       }
     }
 }
