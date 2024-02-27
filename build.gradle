@@ -35,22 +35,16 @@ publishing {
     }
 }
 
-/*
-pluginBundle {
+gradlePlugin {
     website = 'https://github.com/crotwell/gradle-macappbundle'
     vcsUrl = 'https://github.com/crotwell/gradle-macappbundle.git'
-    tags = [ 'gradle', 'plugin', 'macappbundle', 'dmg', 'osx']
-
-
-} */
-
-gradlePlugin {
     plugins {
       macappbundle {
         id = 'edu.sc.seis.macAppBundle'
         displayName = 'MacApp Bundle plugin'
         description = 'A Gradle Plugin to create a Mac OSX .app application based on the project. '
         implementationClass = 'edu.sc.seis.macAppBundle.MacAppBundlePlugin'
+        tags.set([ 'gradle', 'plugin', 'macappbundle', 'dmg', 'osx'])
       }
     }
 }
