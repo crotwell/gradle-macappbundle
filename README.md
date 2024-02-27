@@ -6,12 +6,17 @@ I will consider pull requests, but I believe that the Java world has changed sig
 
 Available at [plugins.gradle.org](https://plugins.gradle.org/plugin/edu.sc.seis.macAppBundle).
 
-**Version 2.3.0 released 27 November 2018.**
+**Version 2.3.1 released 27 February 2024.**
 
 Now available via the Gradle Plugin Portal. Please see:
 http://plugins.gradle.org/plugin/edu.sc.seis.macAppBundle
 
 To add to a gradle project, add this to build.gradle and run **gradle createApp** or **gradle createDmg**. The first should work on most systems, the second will only work on Mac OSX as it uses hdiutils which is a Mac-only application. Also see the [Wiki](https://github.com/crotwell/gradle-macappbundle/wiki/Intro) for more information.
+
+Adding this line to your gradle buildfile may be needed:
+```
+configurations.default.canBeResolved=true
+```
 
 For gradle 2.1 or later:
 ```
