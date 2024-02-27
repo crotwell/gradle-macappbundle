@@ -20,7 +20,6 @@ class MacAppBundlePlugin implements Plugin<Project> {
     static final String PLUGIN_NAME = "macAppBundle"
     static final String GROUP = PLUGIN_NAME
 
-    static final String TASK_CONFIGURE_NAME = "configMacApp"
     static final String TASK_INFO_PLIST_GENERATE_NAME = "generatePlist"
     static final String TASK_PKG_INFO_GENERATE_NAME = "generatePkgInfo"
 
@@ -253,7 +252,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
         task.group = GROUP
         // delay configure of task until extension is populated
         project.afterEvaluate {
-            task.destinationDir = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}")
+            task.destinationDirectory = project.file("${project.buildDir}/${project.macAppBundle.dmgOutputDir}")
             task.from("${->project.buildDir}/${->project.macAppBundle.appOutputDir}") {
                 include "${->project.macAppBundle.appName}.app/**"
                 exclude "${->project.macAppBundle.appName}.app/Contents/MacOS"
@@ -262,7 +261,7 @@ class MacAppBundlePlugin implements Plugin<Project> {
                 include "${->project.macAppBundle.appName}.app/Contents/MacOS/**"
                 fileMode 0777  // octal requires leading zero
             }
-            task.archiveName = "${->project.macAppBundle.dmgName}.zip"
+            task.archiveFileName = "${->project.macAppBundle.dmgName}.zip"
         }
         return task
     }

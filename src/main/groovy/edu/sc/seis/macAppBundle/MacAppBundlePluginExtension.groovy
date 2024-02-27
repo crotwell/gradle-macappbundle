@@ -1,10 +1,8 @@
 package edu.sc.seis.macAppBundle
 
-import java.io.File;
 
 import org.apache.tools.ant.taskdefs.condition.Os;
 
-import org.gradle.api.GradleException
 import org.gradle.api.InvalidUserDataException
 import org.gradle.api.Project;
 import org.gradle.api.plugins.JavaPlugin;
@@ -24,7 +22,7 @@ class MacAppBundlePluginExtension implements Serializable {
         if (jvmVersion == null) jvmVersion = project.targetCompatibility.toString()+"+"
         if (dmgOutputDir == null) dmgOutputDir = "${->project.distsDirName}"
         if (jarTask == null) jarTask = JavaPlugin.JAR_TASK_NAME
-        setAppStyle(appStyle)
+        setAppStyle(project, appStyle)
     }
 
     /** The style of .app created. Use 'Apple' for the original Apple Java in OSX 10.8 and earlier. Starting in
@@ -40,14 +38,20 @@ class MacAppBundlePluginExtension implements Serializable {
     */
     String appStyle = 'Oracle'
     
-    def setAppStyle(String val) {
+    def setAppStyle(Project project, String val) {
         appStyle = val
         if (val == 'Oracle') {
-            bundleExecutable = 'JavaAppLauncher'
+            // not supported anymore, going to override as universalJavaApplicationStub
+            //bundleExecutable = 'JavaAppLauncher'
+            bundleExecutable = 'universalJavaApplicationStub'
             jarSubdir = 'Java'
+            project.logger.warn "'Oracle' appStyle will be overridden with `universalJavaApplicationStub`!"
         } else if (val == 'Apple') {
-            bundleExecutable = 'JavaApplicationStub'
+            // not supported anymore, going to override as universalJavaApplicationStub
+            //bundleExecutable = 'JavaApplicationStub'
+            bundleExecutable = 'universalJavaApplicationStub'
             jarSubdir = 'Resources/Java'
+            project.logger.warn "'Apple' appStyle will be overridden with `universalJavaApplicationStub`!"
         } else if (val == "universalJavaApplicationStub") {
             bundleExecutable = 'universalJavaApplicationStub'
             jarSubdir = 'Java'
@@ -73,7 +77,7 @@ class MacAppBundlePluginExtension implements Serializable {
 
     /** The configuration used to copy jars into the app. Default is runtime, which means use the runtime configuration
         from the java plugin. */ 
-    String runtimeConfigurationName = "runtime"
+    String runtimeConfigurationName = "default"
     
     /** The task that generates the jar, defaults to JavaPlugin.JAR_TASK_NAME. */
     String jarTask

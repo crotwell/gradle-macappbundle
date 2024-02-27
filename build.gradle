@@ -2,22 +2,29 @@
 
 plugins {
   id 'maven-publish'
-  id 'com.gradle.plugin-publish' version '0.10.0'
+  id 'com.gradle.plugin-publish' version '1.2.1'
   id 'java-gradle-plugin'
   id 'eclipse'
   id 'groovy'
 }
 
 group = "edu.sc.seis"
-version = "2.3.0"
+version = "2.3.1"
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java {
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
+}
 
 dependencies {
-  compile gradleApi()
-  compile localGroovy() //not needed for Java plugins
+  implementation gradleApi()
+  implementation localGroovy() //not needed for Java plugins
   // other dependencies that your plugin requires
+}
+
+// taken from https://github.com/crotwell/gradle-macappbundle/pull/74/
+rootProject.tasks.named("processResources") {
+    duplicatesStrategy = 'include'
 }
 
 publishing {
@@ -28,13 +35,14 @@ publishing {
     }
 }
 
+/*
 pluginBundle {
     website = 'https://github.com/crotwell/gradle-macappbundle'
     vcsUrl = 'https://github.com/crotwell/gradle-macappbundle.git'
     tags = [ 'gradle', 'plugin', 'macappbundle', 'dmg', 'osx']
 
 
-}
+} */
 
 gradlePlugin {
     plugins {
